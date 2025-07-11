@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTIMITY - Profil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F4E4E6;
+            color: #333;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Conteneur du périphérique mobile */
+        .device-container {
+            position: relative;
+            width: 375px;
+            height: 760px;
+            background: #111;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Boutons du périphérique */
+        .device-button {
+            position: absolute;
+            width: 3px;
+            height: 50px;
+            background: #222;
+            right: -3px;
+            top: 120px;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+
+        .device-button.volume-up {
+            top: 120px;
+        }
+
+        .device-button.volume-down {
+            top: 180px;
+        }
+
+        .device-button.power {
+            top: 240px;
+            height: 70px;
+        }
+
+        /* Écran du périphérique */
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Encoche du périphérique */
+        .device-notch {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            background: #111;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Container mobile */
+        .mobile-container {
+            width: 100%;
+            height: calc(100% - 70px); /* Réduire la hauteur pour laisser de la place à la barre de navigation */
+            background: #fff;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 0;
+            scroll-behavior: smooth;
+        }
+
+        .mobile-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #8B5A83;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B5A83 0%, #FF6B8A 100%);
+            color: white;
+            padding: 16px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            left: 20px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        /* Profile Picture Section */
+        .profile-picture {
+            text-align: center;
+            padding: 24px 20px;
+            background: white;
+            margin: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(139, 90, 131, 0.1);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 138, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(255, 107, 138, 0.4);
+        }
+
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #8B5A83;
+            margin-bottom: 8px;
+        }
+
+        .profile-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .edit-profile-btn {
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 138, 0.3);
+        }
+
+        /* Settings Sections */
+        .settings-section {
+            margin: 24px 20px;
+        }
+
+        .settings-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8B5A83;
+            margin-bottom: 16px;
+        }
+
+        .settings-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(139, 90, 131, 0.1);
+            overflow: hidden;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #F4E4E6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item:hover {
+            background: #FFF8F9;
+            transform: translateX(4px);
+        }
+
+        .settings-item.active {
+            background: #FFF8F9;
+            border-left: 4px solid #FF6B8A;
+        }
+
+        .settings-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 18px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .settings-item:hover .settings-icon {
+            transform: scale(1.1);
+        }
+
+        .settings-content {
+            flex: 1;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .settings-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .settings-arrow {
+            color: #FF6B8A;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .settings-toggle {
+            width: 44px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .settings-toggle.active {
+            background: #FF6B8A;
+        }
+
+        .settings-toggle::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .settings-toggle.active::before {
+            transform: translateX(20px);
+        }
+
+        /* Cycle Settings */
+        .cycle-settings {
+            background: white;
+            margin: 16px 20px;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(139, 90, 131, 0.1);
+        }
+
+        .cycle-settings h4 {
+            color: #8B5A83;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .cycle-input-group {
+            margin-bottom: 16px;
+        }
+
+        .cycle-input-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .cycle-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #F4E4E6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .cycle-input:focus {
+            outline: none;
+            border-color: #FF6B8A;
+            box-shadow: 0 0 0 3px rgba(255, 107, 138, 0.1);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 375px;
+            max-width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 15px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            transition: transform 0.5s ease, bottom 0.5s ease;
+            will-change: transform, bottom;
+        }
+
+        .bottom-nav.visible {
+            bottom: 0;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 15px;
+            background: white;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #8B5A83;
+            font-size: 10px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-item.active {
+            color: #FF6B8A;
+            background: rgba(255, 107, 138, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.2);
+        }
+
+        .nav-item:hover {
+            color: #FF6B8A;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .profile-picture {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .settings-section {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .settings-section:nth-child(2) { animation-delay: 0.1s; }
+        .settings-section:nth-child(3) { animation-delay: 0.2s; }
+        .settings-section:nth-child(4) { animation-delay: 0.3s; }
+
+        .bottom-nav {
+            animation: slideUp 0.5s ease;
+        }
+
+        /* Haptic feedback */
+        .haptic-feedback {
+            animation: hapticPulse 0.1s ease;
+        }
+
+        @keyframes hapticPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .device-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .device-notch, .device-button {
+                display: none;
+            }
+            
+            .device-screen {
+                border-radius: 0;
+            }
+            
+            .settings-section {
+                margin: 24px 16px;
+            }
+            
+            .profile-picture, .cycle-settings {
+                margin: 16px 16px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #121212;
+                color: #fff;
+            }
+            
+            .device-container {
+                background: #000;
+            }
+            
+            .mobile-container {
+                background: #1C1C1E;
+            }
+            
+            .profile-picture, .settings-list, .cycle-settings {
+                background: #2C2C2E;
+                color: #fff;
+            }
+            
+            .settings-item {
+                border-bottom-color: #3C3C3E;
+            }
+            
+            .settings-item:hover {
+                background: #3C3C3E;
+            }
+            
+            .settings-item.active {
+                background: #3C3C3E;
+            }
+            
+            .settings-title {
+                color: #fff;
+            }
+            
+            .cycle-input {
+                background: #3C3C3E;
+                border-color: #4C4C4E;
+                color: #fff;
+            }
+            
+            .bottom-nav, .bottom-nav::before {
+                background: #2C2C2E;
+                border-top-color: #3C3C3E;
+            }
+            
+            .nav-item {
+                color: #A77A9B;
+            }
+            
+            .nav-item.active {
+                color: #FF6B8A;
+                background: rgba(255, 107, 138, 0.15);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="device-container">
+        <!-- Boutons du périphérique -->
+        <div class="device-button volume-up"></div>
+        <div class="device-button volume-down"></div>
+        <div class="device-button power"></div>
+        
+        <!-- Encoche du périphérique -->
+        <div class="device-notch"></div>
+        
+        <!-- Écran du périphérique -->
+        <div class="device-screen">
+            <div class="mobile-container">
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 🔋</span>
+                </div>
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="back-btn" onclick="goBack()">
+                        <span>←</span>
+                    </div>
+                    <h1>Profil</h1>
+                    <div class="subtitle">Gérez vos paramètres</div>
+                </div>
+
+                <!-- Profile Picture -->
+                <div class="profile-picture">
+                    <div class="profile-avatar" onclick="changeProfilePicture()">
+                        👤
+                    </div>
+                    <div class="profile-name">Marie Dubois</div>
+                    <div class="profile-info">Membre depuis janvier 2024</div>
+                    <button class="edit-profile-btn" onclick="editProfile()">
+                        Modifier le profil
+                    </button>
+                </div>
+
+                <!-- Cycle Settings -->
+                <div class="cycle-settings">
+                    <h4>Paramètres du cycle</h4>
+                    <div class="cycle-input-group">
+                        <label for="cycle-length">Durée du cycle (jours)</label>
+                        <input type="number" id="cycle-length" class="cycle-input" value="28" min="20" max="45">
+                    </div>
+                    <div class="cycle-input-group">
+                        <label for="period-length">Durée des règles (jours)</label>
+                        <input type="number" id="period-length" class="cycle-input" value="5" min="2" max="10">
+                    </div>
+                    <div class="cycle-input-group">
+                        <label for="last-period">Dernières règles</label>
+                        <input type="date" id="last-period" class="cycle-input" value="2025-07-03">
+                    </div>
+                </div>
+
+                <!-- Notifications Settings -->
+                <div class="settings-section">
+                    <h3>Notifications</h3>
+                    <div class="settings-list">
+                        <div class="settings-item" onclick="toggleSetting('period-reminder')">
+                            <div class="settings-icon">🔔</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Rappel des règles</div>
+                                <div class="settings-subtitle">Notification 2 jours avant</div>
+                            </div>
+                            <div class="settings-toggle active" id="period-reminder"></div>
+                        </div>
+                        <div class="settings-item" onclick="toggleSetting('ovulation-reminder')">
+                            <div class="settings-icon">🥚</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Rappel d'ovulation</div>
+                                <div class="settings-subtitle">Notification période fertile</div>
+                            </div>
+                            <div class="settings-toggle active" id="ovulation-reminder"></div>
+                        </div>
+                        <div class="settings-item" onclick="toggleSetting('symptom-reminder')">
+                            <div class="settings-icon">📝</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Rappel de saisie</div>
+                                <div class="settings-subtitle">Quotidien à 20h</div>
+                            </div>
+                            <div class="settings-toggle" id="symptom-reminder"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="settings-section">
+                    <h3>Confidentialité</h3>
+                    <div class="settings-list">
+                        <div class="settings-item" onclick="openSetting('privacy')">
+                            <div class="settings-icon">🔒</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Verrouillage par code</div>
+                                <div class="settings-subtitle">Sécurisez vos données</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openSetting('biometric')">
+                            <div class="settings-icon">👆</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Authentification biométrique</div>
+                                <div class="settings-subtitle">Face ID / Touch ID</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openSetting('backup')">
+                            <div class="settings-icon">☁️</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Sauvegarde</div>
+                                <div class="settings-subtitle">Synchronisation sécurisée</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Settings -->
+                <div class="settings-section">
+                    <h3>Application</h3>
+                    <div class="settings-list">
+                        <div class="settings-item" onclick="openSetting('language')">
+                            <div class="settings-icon">🌐</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Langue</div>
+                                <div class="settings-subtitle">Français</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openSetting('theme')">
+                            <div class="settings-icon">🎨</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Thème</div>
+                                <div class="settings-subtitle">Système</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openSetting('export')">
+                            <div class="settings-icon">📄</div>
+                            <div class="settings-content">
+                                <div class="settings-title">Exporter les données</div>
+                                <div class="settings-subtitle">Format PDF ou CSV</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                        <div class="settings-item" onclick="openSetting('about')">
+                            <div class="settings-icon">ℹ️</div>
+                            <div class="settings-content">
+                                <div class="settings-title">À propos</div>
+                                <div class="settings-subtitle">Version 2.1.0</div>
+                            </div>
+                            <div class="settings-arrow">›</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation (removed) -->
+        </div>
+    </div>
+
+    <!-- Nouveau bouton flottant -->
+    <div class="floating-menu-btn" onclick="toggleMenu()">
+        <div class="menu-icon">☰</div>
+    </div>
+    
+    <div class="floating-menu">
+        <a href="calendrier.html" class="menu-item">📅 Calendrier</a>
+        <a href="Journal.html" class="menu-item">❤️ Journal</a>
+        <a href="assistant.html" class="menu-item">💬 Assistant</a>
+        <a href="profile.html" class="menu-item active">👤 Profil</a>
+    </div>
+
+    <script>
+        // Gestion de l'affichage de la barre de navigation au défilement
+        document.addEventListener('DOMContentLoaded', function() {
+            const navBar = document.querySelector('.bottom-nav');
+            const mobileContainer = document.querySelector('.mobile-container');
+            let lastScrollTop = 0;
+            let isScrollingDown = false;
+            let scrollTimeout;
+            
+            mobileContainer.addEventListener('scroll', function() {
+                const scrollTop = mobileContainer.scrollTop || document.documentElement.scrollTop;
+                isScrollingDown = scrollTop > lastScrollTop;
+                lastScrollTop = scrollTop;
+                
+                // Afficher la barre de navigation lors du défilement vers le bas
+                if (isScrollingDown && scrollTop > 100) {
+                    navBar.classList.add('visible');
+                } else if (!isScrollingDown && scrollTop < 100) {
+                    navBar.classList.remove('visible');
+                }
+                
+                // Cacher la barre de navigation après un certain temps d'inactivité
+                clearTimeout(scrollTimeout);
+                if (scrollTop > 100) {
+                    scrollTimeout = setTimeout(() => {
+                        if (isScrollingDown) {
+                            navBar.classList.remove('visible');
+                        }
+                    }, 2000);
+                }
+            });
+            
+            // Garder la barre visible au survol
+            navBar.addEventListener('mouseenter', function() {
+                navBar.classList.add('visible');
+                clearTimeout(scrollTimeout);
+            });
+            
+            navBar.addEventListener('mouseleave', function() {
+                if (mobileContainer.scrollTop > 100) {
+                    scrollTimeout = setTimeout(() => {
+                        navBar.classList.remove('visible');
+                    }, 1000);
+                }
+            });
+        });
+        // Haptic feedback simulation
+        function hapticFeedback(element) {
+            element.classList.add('haptic-feedback');
+            setTimeout(() => {
+                element.classList.remove('haptic-feedback');
+            }, 100);
+        }
+
+        // Go back function
+        function goBack() {
+            const backBtn = event.target.closest('.back-btn');
+            hapticFeedback(backBtn);
+            showNotification('Retour à l\'accueil');
+            // Simulate navigation back
+            setTimeout(() => {
+                window.history.back();
+            }, 300);
+        }
+
+        // Profile functions
+        function changeProfilePicture() {
+            const avatar = event.target.closest('.profile-avatar');
+            hapticFeedback(avatar);
+            showNotification('Changement de photo de profil');
+        }
+
+        function editProfile() {
+            const btn = event.target;
+            hapticFeedback(btn);
+            showNotification('Modification du profil');
+        }
+
+        // Settings functions
+        function toggleSetting(settingId) {
+            const toggle = document.getElementById(settingId);
+            const item = event.target.closest('.settings-item');
+            
+            hapticFeedback(item);
+            
+            if (toggle.classList.contains('active')) {
+                toggle.classList.remove('active');
+                showNotification('Paramètre désactivé');
+            } else {
+                toggle.classList.add('active');
+                showNotification('Paramètre activé');
+            }
+        }
+
+        function openSetting(settingType) {
+            const item = event.target.closest('.settings-item');
+            hapticFeedback(item);
+            
+            // Add active state
+            item.classList.add('active');
+            setTimeout(() => {
+                item.classList.remove('active');
+            }, 300);
+            
+            let message = "";
+            switch(settingType) {
+                case 'privacy':
+                    message = "Paramètres de confidentialité";
+                    break;
+                case 'biometric':
+                    message = "Authentification biométrique";
+                    break;
+                case 'backup':
+                    message = "Paramètres de sauvegarde";
+                    break;
+                case 'language':
+                    message = "Sélection de langue";
+                    break;
+                case 'theme':
+                    message = "Paramètres de thème";
+                    break;
+                case 'export':
+                    message = "Exportation des données";
+                    break;
+                case 'about':
+                    message = "À propos de l'application";
+                    break;
+                default:
+                    message = "Paramètres ouverts";
+            }
+            
+            showNotification(message);
+        }
+
+        // Bottom navigation with same animation as index.html
+        function showTab(tab) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeItem = event.target.closest('.nav-item');
+            activeItem.classList.add('active');
+            hapticFeedback(activeItem);
+            
+            // Animation de la barre de navigation (effet puzzle)
+            const bottomNav = document.querySelector('.bottom-nav');
+            bottomNav.style.transform = 'translateY(5px)';
+            
+            setTimeout(() => {
+                bottomNav.style.transform = 'translateY(0)';
+            }, 200);
+            
+            let message = "";
+            switch(tab) {
+                case 'calendar':
+                    message = "Calendrier du cycle ouvert";
+                    break;
+                case 'journal':
+                    message = "Journal de santé ouvert";
+                    break;
+                case 'assistant':
+                    message = "Assistant IA activé";
+                    break;
+                case 'profile':
+                    message = "Profil utilisateur ouvert";
+                    break;
+                default:
+                    message = `Onglet ${tab} ouvert`;
+            }
+            
+            showNotification(message);
+        }
+
+        // Notification system
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 20px;
+                font-size: 14px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                max-width: 300px;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        // Input validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cycleInputs = document.querySelectorAll('.cycle-input');
+            
+            cycleInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    hapticFeedback(this);
+                    showNotification('Paramètre mis à jour');
+                });
+            });
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                document.querySelector('.status-bar span').textContent = timeString;
+            }, 1000);
+            
+            // Navigation bar scroll effect (same as index.html)
+            const navBar = document.querySelector('.bottom-nav');
+            let lastScrollTop = 0;
+            
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > lastScrollTop) {
+                    // Scrolling down
+                    navBar.style.transform = 'translateY(100%)';
+                } else {
+                    // Scrolling up
+                    navBar.style.transform = 'translateY(0)';
+                }
+                
+                lastScrollTop = scrollTop;
+            });
+        }); // Fin de l'écouteur d'événement DOMContentLoaded
+    </script>
+</body>
+</html>

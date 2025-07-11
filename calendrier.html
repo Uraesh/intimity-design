@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTIMITY - Calendrier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Conteneur du périphérique mobile */
+        .device-container {
+            position: relative;
+            width: 375px;
+            height: 760px;
+            background: #111;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Boutons du périphérique */
+        .device-button {
+            position: absolute;
+            width: 3px;
+            height: 50px;
+            background: #222;
+            right: -3px;
+            top: 120px;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+
+        .device-button.volume-up {
+            top: 120px;
+        }
+
+        .device-button.volume-down {
+            top: 180px;
+        }
+
+        .device-button.power {
+            top: 240px;
+            height: 70px;
+        }
+
+        /* Écran du périphérique */
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: #1f1f1f;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Encoche du périphérique */
+        .device-notch {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            background: #111;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Container mobile */
+        .mobile-container {
+            width: 100%;
+            height: calc(100% - 70px); /* Réduire la hauteur pour laisser de la place à la barre de navigation */
+            background: #1f1f1f;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 0;
+            scroll-behavior: smooth;
+        }
+        
+        .mobile-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mobile-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #8B5A83;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Header */
+        .header {
+            background: #2a2a2a;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            color: #FF6B8A;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .month-btn {
+            background: #8B5A83;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .month-btn:hover {
+            background: #FF6B8A;
+            transform: scale(1.05);
+        }
+
+        .current-month {
+            color: #FF6B8A;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            padding: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header {
+            text-align: center;
+            font-weight: 600;
+            color: #8B5A83;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 14px;
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .calendar-day:hover {
+            background: #3a3a3a;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.other-month {
+            color: #666;
+            background: #1a1a1a;
+        }
+
+        .calendar-day.today {
+            background: #FF6B8A;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(255, 107, 138, 0.3);
+        }
+
+        .calendar-day.period {
+            background: #DC2626;
+            color: white;
+        }
+
+        .calendar-day.period::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .calendar-day.fertile {
+            background: #10B981;
+            color: white;
+        }
+
+        .calendar-day.fertile::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .calendar-day.ovulation {
+            background: #F59E0B;
+            color: white;
+            position: relative;
+        }
+
+        .calendar-day.ovulation::after {
+            content: '♦';
+            position: absolute;
+            bottom: 1px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 10px;
+        }
+
+        /* Legend */
+        .legend {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        .legend h3 {
+            color: #FF6B8A;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.period {
+            background: #DC2626;
+        }
+
+        .legend-color.fertile {
+            background: #10B981;
+        }
+
+        .legend-color.ovulation {
+            background: #F59E0B;
+        }
+
+        .legend-color.today {
+            background: #FF6B8A;
+        }
+
+        .legend-text {
+            color: #ccc;
+            font-size: 12px;
+        }
+
+        /* Cycle Info */
+        .cycle-info {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        .cycle-info h3 {
+            color: #FF6B8A;
+            margin-bottom: 15px;
+        }
+
+        .cycle-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #FF6B8A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 12px;
+        }
+
+        /* Bottom Navigation */
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 375px;
+            max-width: 100%;
+            background: #1C1C1E; /* Fond mode sombre iOS / #121212 pour Android */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-bar.visible {
+            transform: translateY(0);
+            bottom: 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex: 1;
+            color: #8B5A83; /* Prune Sophistiquée pour inactif */
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 200ms ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item.active {
+            color: #FF6B8A; /* Corail Moderne pour actif */
+        }
+        
+        .nav-item:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.3);
+            outline-offset: 2px;
+        }
+        
+        .material-icons {
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: all 200ms ease;
+        }
+        
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+        }
+        
+        /* Indicateur de défilement */
+        .scroll-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 1;
+            transition: opacity 300ms ease;
+            z-index: 999;
+        }
+        
+        .scroll-hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .fas {
+            font-family: FontAwesome;
+        }
+
+        .fas.fa-wifi::before { content: '📶'; }
+        .fas.fa-battery-full::before { content: '🔋'; }
+        .fas.fa-home::before { content: '🏠'; }
+        .fas.fa-calendar-alt::before { content: '📅'; }
+        .fas.fa-notes-medical::before { content: '📋'; }
+        .fas.fa-user::before { content: '👤'; }
+        .fas.fa-chevron-left::before { content: '‹'; }
+        .fas.fa-chevron-right::before { content: '›'; }
+    </style>
+</head>
+<body>
+    <div class="device-container">
+        <div class="device-button volume-up"></div>
+        <div class="device-button volume-down"></div>
+        <div class="device-button power"></div>
+        <div class="device-screen">
+            <div class="device-notch"></div>
+            <div class="mobile-container">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>
+                        <i class="fas fa-wifi"></i>
+                        <i class="fas fa-battery-full"></i>
+                    </span>
+                </div>
+                
+                <div class="header">
+                    <h1>Calendrier</h1>
+                    <div class="month-navigation">
+                        <button class="month-btn" onclick="previousMonth()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="current-month" id="currentMonth">Juillet 2025</span>
+                        <button class="month-btn" onclick="nextMonth()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-grid">
+                        <div class="calendar-header">Dim</div>
+                        <div class="calendar-header">Lun</div>
+                        <div class="calendar-header">Mar</div>
+                        <div class="calendar-header">Mer</div>
+                        <div class="calendar-header">Jeu</div>
+                        <div class="calendar-header">Ven</div>
+                        <div class="calendar-header">Sam</div>
+                        
+                        <!-- Jours du calendrier -->
+                        <div class="calendar-day other-month">29</div>
+                        <div class="calendar-day other-month">30</div>
+                        <div class="calendar-day">1</div>
+                        <div class="calendar-day">2</div>
+                        <div class="calendar-day">3</div>
+                        <div class="calendar-day">4</div>
+                        <div class="calendar-day">5</div>
+                        <div class="calendar-day">6</div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day">8</div>
+                        <div class="calendar-day">9</div>
+                        <div class="calendar-day">10</div>
+                        <div class="calendar-day today">11</div>
+                        <div class="calendar-day">12</div>
+                        <div class="calendar-day">13</div>
+                        <div class="calendar-day fertile">14</div>
+                        <div class="calendar-day fertile">15</div>
+                        <div class="calendar-day ovulation">16</div>
+                        <div class="calendar-day fertile">17</div>
+                        <div class="calendar-day fertile">18</div>
+                        <div class="calendar-day">19</div>
+                        <div class="calendar-day">20</div>
+                        <div class="calendar-day">21</div>
+                        <div class="calendar-day">22</div>
+                        <div class="calendar-day">23</div>
+                        <div class="calendar-day">24</div>
+                        <div class="calendar-day">25</div>
+                        <div class="calendar-day">26</div>
+                        <div class="calendar-day period">27</div>
+                        <div class="calendar-day period">28</div>
+                        <div class="calendar-day period">29</div>
+                        <div class="calendar-day period">30</div>
+                        <div class="calendar-day period">31</div>
+                        <div class="calendar-day other-month period">1</div>
+                        <div class="calendar-day other-month period">2</div>
+                    </div>
+
+                    <div class="legend">
+                        <h3>Légende</h3>
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <div class="legend-color period"></div>
+                                <span class="legend-text">Règles</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color fertile"></div>
+                                <span class="legend-text">Période fertile</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color ovulation"></div>
+                                <span class="legend-text">Ovulation</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color today"></div>
+                                <span class="legend-text">Aujourd'hui</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cycle-info">
+                        <h3>Informations du cycle</h3>
+                        <div class="cycle-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">28</div>
+                                <div class="stat-label">Durée du cycle</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">Jours de règles</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">16</div>
+                                <div class="stat-label">Prochaine ovulation</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">27</div>
+                                <div class="stat-label">Prochaines règles</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indicateur de défilement -->
+                <div class="scroll-hint" role="alert" aria-hidden="true">
+                    <div class="scroll-indicator">
+                        <!-- Supprimé: 
+                        <span class="material-icons">keyboard_arrow_up</span> -->
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <a href="calendrier.html" class="nav-item active">
+                    <div class="nav-icon">📅</div>
+                    <span>Calendrier</span>
+                </a>
+                <a href="Journal.html" class="nav-item">
+                    <div class="nav-icon">❤️</div>
+                    <span>Journal</span>
+                </a>
+                <a href="assistant.html" class="nav-item">
+                    <div class="nav-icon">💬</div>
+                    <span>Assistant</span>
+                </a>
+                <a href="profile.html" class="nav-item">
+                    <div class="nav-icon">👤</div>
+                    <span>Profil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de l'affichage de la barre de navigation au défilement
+        // Variables globales pour la navigation
+        let lastScrollTop = 0;
+        let isScrolling = false;
+        let scrollTimeout;
+        let hintTimeout;
+        
+        // Détection de la plateforme (iOS/Android)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        
+        // Mettre à jour les icônes en fonction de la plateforme
+        function updateIcons() {
+            const calendarIcon = document.querySelector('[aria-label="Calendrier"] .material-icons');
+            const journalIcon = document.querySelector('[aria-label="Journal"] .material-icons');
+            const assistantIcon = document.querySelector('[aria-label="Assistant IA"] .material-icons');
+            const profileIcon = document.querySelector('[aria-label="Profil"] .material-icons');
+            
+            if (isIOS && calendarIcon && journalIcon && assistantIcon && profileIcon) {
+                calendarIcon.textContent = 'calendar';
+                journalIcon.textContent = 'favorite';
+                assistantIcon.textContent = 'chat_bubble';
+                profileIcon.textContent = 'person';
+            }
+        }
+
+        // Fonction pour gérer le défilement avec animation fluide
+        function handleScroll() {
+            const navBar = document.querySelector('.nav-bar');
+            const scrollHint = document.querySelector('.scroll-hint');
+            const mobileContainer = document.querySelector('.mobile-container');
+            
+            if (isScrolling || !navBar || !mobileContainer) return;
+            isScrolling = true;
+            
+            const st = mobileContainer.scrollTop || document.documentElement.scrollTop;
+            const isScrollingDown = st > lastScrollTop;
+            
+            // Animation d'apparition/disparition de l'indicateur
+            if (st > 100 && isScrollingDown) {
+                if (scrollHint) scrollHint.classList.add('hidden');
+                navBar.style.transform = 'translateX(-50%) translateY(0)';
+                navBar.classList.add('visible');
+            } else if (st <= 100 || !isScrollingDown) {
+                navBar.style.transform = 'translateX(-50%) translateY(0)';
+                navBar.classList.add('visible');
+            }
+            
+            lastScrollTop = st <= 0 ? 0 : st;
+            
+            // Cacher la barre après un délai d'inactivité
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (st > 100) {
+                    navBar.style.transform = 'translateX(-50%) translateY(100%)';
+                    setTimeout(() => {
+                        navBar.classList.remove('visible');
+                    }, 300);
+                }
+                isScrolling = false;
+            }, 2000);
+            
+            // Réinitialiser l'état de défilement
+            requestAnimationFrame(() => {
+                isScrolling = false;
+            });
+        }
+        
+        // Fonction pour gérer le toucher
+        function handleTouchMove(e) {
+            if (e.touches.length === 1) {
+                handleScroll();
+            }
+        }
+
+        // Initialisation
+        function initNavigation() {
+            updateIcons();
+            
+            const scrollHint = document.querySelector('.scroll-hint');
+            const mobileContainer = document.querySelector('.mobile-container');
+            
+            // Masquer l'indicateur après 5 secondes
+            if (scrollHint) {
+                hintTimeout = setTimeout(() => {
+                    scrollHint.classList.add('hidden');
+                }, 5000);
+                
+                // Réinitialiser le timer d'inactivité de l'indicateur
+                document.addEventListener('mousemove', () => {
+                    clearTimeout(hintTimeout);
+                    scrollHint.classList.remove('hidden');
+                    hintTimeout = setTimeout(() => {
+                        scrollHint.classList.add('hidden');
+                    }, 5000);
+                });
+            }
+            
+            // Gestion des événements tactiles
+            if (mobileContainer) {
+                mobileContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
+                mobileContainer.addEventListener('scroll', handleScroll, { passive: true });
+            }
+            
+            // Gestion du clic sur les éléments de navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Mettre à jour l'état actif
+                    document.querySelectorAll('.nav-item').forEach(i => {
+                        i.classList.remove('active');
+                        i.setAttribute('data-active', 'false');
+                    });
+                    this.classList.add('active');
+                    this.setAttribute('data-active', 'true');
+                });
+            });
+        }
+        
+        // Démarrer l'initialisation de la navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            initNavigation();
+            
+            // Initialisation du calendrier
+            if (typeof updateMonthDisplay === 'function') {
+                updateMonthDisplay();
+            }
+            
+            // Gestion des boutons de navigation du calendrier
+            const prevMonthBtn = document.querySelector('.prev-month');
+            const nextMonthBtn = document.querySelector('.next-month');
+            
+            if (prevMonthBtn && typeof previousMonth === 'function') {
+                prevMonthBtn.addEventListener('click', previousMonth);
+            }
+            
+            if (nextMonthBtn && typeof nextMonth === 'function') {
+                nextMonthBtn.addEventListener('click', nextMonth);
+            }
+        });
+        const months = [
+            'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        ];
+
+        let currentMonthIndex = 6; // Juillet
+        let currentYear = 2025;
+
+        function updateMonthDisplay() {
+            document.getElementById('currentMonth').textContent = `${months[currentMonthIndex]} ${currentYear}`;
+        }
+
+        function previousMonth() {
+            currentMonthIndex--;
+            if (currentMonthIndex < 0) {
+                currentMonthIndex = 11;
+                currentYear--;
+            }
+            updateMonthDisplay();
+            // Ici, vous pouvez ajouter la logique pour mettre à jour le calendrier
+        }
+
+        function nextMonth() {
+            currentMonthIndex++;
+            if (currentMonthIndex > 11) {
+                currentMonthIndex = 0;
+                currentYear++;
+            }
+            updateMonthDisplay();
+            // Ici, vous pouvez ajouter la logique pour mettre à jour le calendrier
+        }
+
+        // Ajouter des événements de clic aux jours du calendrier
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function() {
+                if (!this.classList.contains('other-month')) {
+                    // Retirer la classe 'selected' de tous les jours
+                    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                    // Ajouter la classe 'selected' au jour cliqué
+                    this.classList.add('selected');
+                    
+                    // Ici, vous pouvez ajouter la logique pour afficher les détails du jour sélectionné
+                    console.log('Jour sélectionné:', this.textContent);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

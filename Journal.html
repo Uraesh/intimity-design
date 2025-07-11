@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTIMITY - Journal de Santé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Conteneur du périphérique mobile */
+        .device-container {
+            position: relative;
+            width: 375px;
+            height: 760px;
+            background: #111;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Boutons du périphérique */
+        .device-button {
+            position: absolute;
+            width: 3px;
+            height: 50px;
+            background: #222;
+            right: -3px;
+            top: 120px;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+
+        .device-button.volume-up {
+            top: 120px;
+        }
+
+        .device-button.volume-down {
+            top: 180px;
+        }
+
+        .device-button.power {
+            top: 240px;
+            height: 70px;
+        }
+
+        /* Écran du périphérique */
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: #1f1f1f;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Encoche du périphérique */
+        .device-notch {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            background: #111;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Container mobile */
+        .mobile-container {
+            width: 100%;
+            height: calc(100% - 70px); /* Réduire la hauteur pour laisser de la place à la barre de navigation */
+            background: #1f1f1f;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #8B5A83;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Header */
+        .header {
+            background: #2a2a2a;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            color: #FF6B8A;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .date-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .date-btn {
+            background: #8B5A83;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .date-btn:hover {
+            background: #FF6B8A;
+            transform: scale(1.05);
+        }
+
+        .current-date {
+            color: #FF6B8A;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Tracking Section */
+        .tracking-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        .section-title {
+            color: #FF6B8A;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 20px;
+        }
+
+        /* Mood Tracking */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mood-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .mood-item:hover {
+            background: #333;
+        }
+
+        .mood-item.selected {
+            border-color: #FF6B8A;
+            background: #FF6B8A20;
+        }
+
+        .mood-emoji {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .mood-label {
+            font-size: 10px;
+            color: #ccc;
+            text-align: center;
+        }
+
+        /* Symptoms */
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .symptom-item:hover {
+            background: #333;
+        }
+
+        .symptom-item.selected {
+            border-color: #FF6B8A;
+            background: #FF6B8A20;
+        }
+
+        .symptom-icon {
+            font-size: 16px;
+        }
+
+        .symptom-text {
+            font-size: 12px;
+            color: #fff;
+        }
+
+        /* Flow Intensity */
+        .flow-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .flow-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .flow-item:hover {
+            background: #333;
+        }
+
+        .flow-item.selected {
+            border-color: #FF6B8A;
+            background: #FF6B8A20;
+        }
+
+        .flow-dots {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+
+        .flow-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .flow-dot.active {
+            background: #DC2626;
+        }
+
+        .flow-label {
+            font-size: 10px;
+            color: #ccc;
+        }
+
+        /* Notes Section */
+        .notes-section {
+            margin-bottom: 20px;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 80px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: #FF6B8A;
+        }
+
+        /* Save Button */
+        .save-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #FF6B8A, #8B5A83);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 138, 0.3);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #FF6B8A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        /* Chart placeholder */
+        .chart-container {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .chart-placeholder {
+            height: 120px;
+            background: linear-gradient(135deg, #FF6B8A20, #8B5A8320);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        /* Bottom Navigation - iOS/Android */
+        .nav-bar {
+            position: fixed;
+            bottom: -56px; /* Masquée par défaut */
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            width: 100%;
+            max-width: 500px;
+            height: 56px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #1C1C1E; /* Fond mode sommeil iOS / #121212 pour Android */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-bar.visible {
+            transform: translateX(-50%) translateY(0);
+            bottom: 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex: 1;
+            color: #8B5A83; /* Prune Sophistiquée pour inactif */
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 200ms ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item.active {
+            color: #FF6B8A; /* Corail Moderne pour actif */
+        }
+        
+        .nav-item:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.3);
+            outline-offset: 2px;
+        }
+        
+        .material-icons {
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: all 200ms ease;
+        }
+        
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+        }
+        
+        /* Indicateur de défilement */
+        .scroll-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 1;
+            transition: opacity 300ms ease;
+            z-index: 999;
+        }
+        
+        .scroll-hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #8B5A83; /* Prune Sophistiquée pour l'état inactif */
+            font-size: 10px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-item.active {
+            color: #FF6B8A; /* Corail Moderne pour l'état actif */
+            background: rgba(255, 107, 138, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.2);
+        }
+
+        .nav-item:hover {
+            color: #FF6B8A;
+            transform: translateY(-2px);
+        }
+
+        .nav-item i {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Icons */
+        .fas {
+            font-family: FontAwesome;
+        }
+
+        .fas.fa-wifi::before { content: '📶'; }
+        .fas.fa-battery-full::before { content: '🔋'; }
+        .fas.fa-home::before { content: '🏠'; }
+        .fas.fa-calendar-alt::before { content: '📅'; }
+        .fas.fa-notes-medical::before { content: '📋'; }
+        .fas.fa-user::before { content: '👤'; }
+        .fas.fa-chevron-left::before { content: '‹'; }
+        .fas.fa-chevron-right::before { content: '›'; }
+        .fas.fa-heart::before { content: '❤️'; }
+        .fas.fa-brain::before { content: '🧠'; }
+        .fas.fa-tint::before { content: '💧'; }
+        .fas.fa-sticky-note::before { content: '📝'; }
+        .fas.fa-chart-line::before { content: '📊'; }
+    </style>
+</head>
+<body>
+    <div class="device-container">
+        <div class="device-button volume-up"></div>
+        <div class="device-button volume-down"></div>
+        <div class="device-button power"></div>
+        <div class="device-screen">
+            <div class="device-notch"></div>
+            <div class="mobile-container">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>
+                        <i class="fas fa-wifi"></i>
+                        <i class="fas fa-battery-full"></i>
+                    </span>
+                </div>
+                
+                <div class="header">
+                    <h1>Journal de Santé</h1>
+                    <div class="date-selector">
+                        <button class="date-btn" onclick="previousDay()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="current-date" id="currentDate">11 Juillet 2025</span>
+                        <button class="date-btn" onclick="nextDay()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <!-- Mood Tracking -->
+                    <div class="tracking-section">
+                        <h3 class="section-title">
+                            <span class="section-icon">😊</span>
+                            Humeur
+                        </h3>
+                        <div class="mood-grid">
+                            <div class="mood-item" onclick="selectMood(this)">
+                                <div class="mood-emoji">😢</div>
+                                <div class="mood-label">Triste</div>
+                            </div>
+                            <div class="mood-item" onclick="selectMood(this)">
+                                <div class="mood-emoji">😟</div>
+                                <div class="mood-label">Anxieuse</div>
+                            </div>
+                            <div class="mood-item selected" onclick="selectMood(this)">
+                                <div class="mood-emoji">😐</div>
+                                <div class="mood-label">Neutre</div>
+                            </div>
+                            <div class="mood-item" onclick="selectMood(this)">
+                                <div class="mood-emoji">😊</div>
+                                <div class="mood-label">Heureuse</div>
+                            </div>
+                            <div class="mood-item" onclick="selectMood(this)">
+                                <div class="mood-emoji">😍</div>
+                                <div class="mood-label">Radieuse</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Symptoms -->
+                    <div class="tracking-section">
+                        <h3 class="section-title">
+                            <span class="section-icon">🩺</span>
+                            Symptômes
+                        </h3>
+                        <div class="symptoms-grid">
+                            <div class="symptom-item selected" onclick="toggleSymptom(this)">
+                                <span class="symptom-icon">🤕</span>
+                                <span class="symptom-text">Maux de tête</span>
+                            </div>
+                            <div class="symptom-item" onclick="toggleSymptom(this)">
+                                <span class="symptom-icon">😰</span>
+                                <span class="symptom-text">Nausées</span>
+                            </div>
+                            <div class="symptom-item selected" onclick="toggleSymptom(this)">
+                                <span class="symptom-icon">💢</span>
+                                <span class="symptom-text">Crampes</span>
+                            </div>
+                            <div class="symptom-item" onclick="toggleSymptom(this)">
+                                <span class="symptom-icon">🌡️</span>
+                                <span class="symptom-text">Fièvre</span>
+                            </div>
+                            <div class="symptom-item" onclick="toggleSymptom(this)">
+                                <span class="symptom-icon">😴</span>
+                                <span class="symptom-text">Fatigue</span>
+                            </div>
+                            <div class="symptom-item" onclick="toggleSymptom(this)">
+                                <span class="symptom-icon">🍽️</span>
+                                <span class="symptom-text">Fringales</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flow Intensity -->
+                    <div class="tracking-section">
+                        <h3 class="section-title">
+                            <span class="section-icon">💧</span>
+                            Intensité du flux
+                        </h3>
+                        <div class="flow-selector">
+                            <div class="flow-item" onclick="selectFlow(this)">
+                                <div class="flow-dots">
+                                    <div class="flow-dot"></div>
+                                    <div class="flow-dot"></div>
+                                    <div class="flow-dot"></div>
+                                </div>
+                                <div class="flow-label">Absent</div>
+                            </div>
+                            <div class="flow-item" onclick="selectFlow(this)">
+                                <div class="flow-dots">
+                                    <div class="flow-dot active"></div>
+                                    <div class="flow-dot"></div>
+                                    <div class="flow-dot"></div>
+                                </div>
+                                <div class="flow-label">Léger</div>
+                            </div>
+                            <div class="flow-item selected" onclick="selectFlow(this)">
+                                <div class="flow-dots">
+                                    <div class="flow-dot active"></div>
+                                    <div class="flow-dot active"></div>
+                                    <div class="flow-dot"></div>
+                                </div>
+                                <div class="flow-label">Modéré</div>
+                            </div>
+                            <div class="flow-item" onclick="selectFlow(this)">
+                                <div class="flow-dots">
+                                    <div class="flow-dot active"></div>
+                                    <div class="flow-dot active"></div>
+                                    <div class="flow-dot active"></div>
+                                </div>
+                                <div class="flow-label">Abondant</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="tracking-section">
+                        <h3 class="section-title">
+                            <span class="section-icon">📝</span>
+                            Notes personnelles
+                        </h3>
+                        <textarea class="notes-textarea" placeholder="Ajoutez vos notes du jour..."></textarea>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button class="save-btn" onclick="saveEntry()">
+                        Enregistrer les données
+                    </button>
+
+                    <!-- Statistics -->
+                    <div class="stats-section">
+                        <h3 class="section-title">
+                            <span class="section-icon">📊</span>
+                            Statistiques du mois
+                        </h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Jours suivis</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">Symptômes moyens</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">😊</div>
+                                <div class="stat-label">Humeur générale</div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                📈 Graphique d'évolution des symptômes
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Le contenu de la barre de navigation a été déplacé en dehors du mobile-container -->
+                
+                <!-- Indicateur de défilement -->
+                <div class="scroll-hint" role="alert" aria-hidden="true">
+                    <span class="material-icons">keyboard_arrow_up</span>
+                    <span>Faites défiler vers le bas pour afficher la navigation</span>
+                </div>
+            </div>
+            
+            <!-- Barre de navigation -->
+            <div class="nav-bar" role="navigation" aria-label="Navigation principale">
+                <a href="calendrier.html" class="nav-item" aria-label="Calendrier" data-active="false">
+                    <span class="material-icons md-24" aria-hidden="true">event</span>
+                    <span class="nav-label">Calendrier</span>
+                </a>
+                <a href="Journal.html" class="nav-item active" aria-label="Journal" data-active="true">
+                    <span class="material-icons md-24" aria-hidden="true">favorite</span>
+                    <span class="nav-label">Journal</span>
+                </a>
+                <a href="index.html" class="nav-item" aria-label="Accueil" data-active="false">
+                    <span class="material-icons md-24" aria-hidden="true">home</span>
+                    <span class="nav-label">Accueil</span>
+                </a>
+                <a href="assistant.html" class="nav-item" aria-label="Assistant IA" data-active="false">
+                    <span class="material-icons md-24" aria-hidden="true">chat</span>
+                    <span class="nav-label">Assistant</span>
+                </a>
+                <a href="profile.html" class="nav-item" aria-label="Profil" data-active="false">
+                    <span class="material-icons md-24" aria-hidden="true">account_circle</span>
+                    <span class="nav-label">Profil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script>
+        // Gestion de l'affichage de la barre de navigation au défilement
+        document.addEventListener('DOMContentLoaded', function() {
+            const navBar = document.querySelector('.nav-bar');
+            const mobileContainer = document.querySelector('.mobile-container');
+            const scrollHint = document.querySelector('.scroll-hint');
+            let lastScrollTop = 0;
+            let isScrolling = false;
+            let scrollTimeout;
+            let hintTimeout;
+            
+            // Détection de la plateforme (iOS/Android)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            // Mettre à jour les icônes en fonction de la plateforme
+            function updateIcons() {
+                const calendarIcon = document.querySelector('[aria-label="Calendrier"] .material-icons');
+                const journalIcon = document.querySelector('[aria-label="Journal"] .material-icons');
+                const assistantIcon = document.querySelector('[aria-label="Assistant IA"] .material-icons');
+                const profileIcon = document.querySelector('[aria-label="Profil"] .material-icons');
+                
+                if (isIOS) {
+                    calendarIcon.textContent = 'calendar';
+                    journalIcon.textContent = 'favorite';
+                    assistantIcon.textContent = 'chat_bubble';
+                    profileIcon.textContent = 'person';
+                }
+            }
+
+            // Fonction pour gérer le défilement avec animation fluide
+            function handleScroll() {
+                if (isScrolling) return;
+                isScrolling = true;
+                
+                const st = mobileContainer.scrollTop || document.documentElement.scrollTop;
+                const isScrollingDown = st > lastScrollTop;
+                
+                // Animation d'apparition/disparition de l'indicateur
+                if (st > 100 && isScrollingDown) {
+                    scrollHint.classList.add('hidden');
+                    navBar.style.transform = 'translateX(-50%) translateY(0)';
+                    navBar.classList.add('visible');
+                } else if (st <= 100 || !isScrollingDown) {
+                    navBar.style.transform = 'translateX(-50%) translateY(0)';
+                    navBar.classList.add('visible');
+                }
+                
+                lastScrollTop = st <= 0 ? 0 : st;
+                
+                // Cacher la barre après un délai d'inactivité
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (st > 100) {
+                        navBar.style.transform = 'translateX(-50%) translateY(100%)';
+                        setTimeout(() => {
+                            navBar.classList.remove('visible');
+                        }, 300);
+                    }
+                    isScrolling = false;
+                }, 2000);
+                
+                // Réinitialiser l'état de défilement
+                requestAnimationFrame(() => {
+                    isScrolling = false;
+                });
+            }
+            
+            // Fonction pour gérer le toucher
+            function handleTouchMove(e) {
+                if (e.touches.length === 1) {
+                    handleScroll();
+                }
+            }
+
+            // Initialisation
+            function init() {
+                updateIcons();
+                
+                // Masquer l'indicateur après 5 secondes
+                hintTimeout = setTimeout(() => {
+                    scrollHint.classList.add('hidden');
+                }, 5000);
+                
+                // Réinitialiser le timer d'inactivité de l'indicateur
+                document.addEventListener('mousemove', () => {
+                    clearTimeout(hintTimeout);
+                    hintTimeout = setTimeout(() => {
+                        scrollHint.classList.add('hidden');
+                    }, 5000);
+                });
+                
+                // Gestion des événements tactiles
+                mobileContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
+                mobileContainer.addEventListener('scroll', handleScroll, { passive: true });
+                
+                // Gestion du clic sur les éléments de navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        // Mettre à jour l'état actif
+                        document.querySelectorAll('.nav-item').forEach(i => {
+                            i.classList.remove('active');
+                            i.setAttribute('data-active', 'false');
+                        });
+                        this.classList.add('active');
+                        this.setAttribute('data-active', 'true');
+                    });
+                });
+            }
+            
+            // Démarrer l'initialisation
+            init();
+        });
+        // Date management
+        const today = new Date();
+        let currentDate = new Date(today);
+
+        function updateDateDisplay() {
+            const options = { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = 
+                currentDate.toLocaleDateString('fr-FR', options);
+        }
+
+        function previousDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateDisplay();
+            loadDayData();
+        }
+
+        function nextDay() {
+            if (currentDate < today) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                updateDateDisplay();
+                loadDayData();
+            }
+        }
+
+        // Mood selection
+        function selectMood(element) {
+            document.querySelectorAll('.mood-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // Symptom toggle
+        function toggleSymptom(element) {
+            element.classList.toggle('selected');
+        }
+
+        // Flow selection
+        function selectFlow(element) {
+            document.querySelectorAll('.flow-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // Save entry
+        function saveEntry() {
+            // Collect data
+            const selectedMood = document.querySelector('.mood-item.selected');
+            const selectedSymptoms = document.querySelectorAll('.symptom-item.selected');
+            const selectedFlow = document.querySelector('.flow-item.selected');
+            const notes = document.querySelector('.notes-textarea').value;
+
+            // Simulate save
+            const saveBtn = document.querySelector('.save-btn');
+            saveBtn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+            saveBtn.textContent = 'Enregistré ✓';
+            
+            setTimeout(() => {
+                saveBtn.style.background = 'linear-gradient(135deg, #FF6B8A, #8B5A83)';
+                saveBtn.textContent = 'Enregistrer les données';
+            }, 2000);
+
+            console.log('Données sauvegardées:', {
+                date: currentDate.toISOString().split('T')[0],
+                mood: selectedMood ? selectedMood.querySelector('.mood-label').textContent : null,
+                symptoms: Array.from(selectedSymptoms).map(s => s.querySelector('.symptom-text').textContent),
+                flow: selectedFlow ? selectedFlow.querySelector('.flow-label').textContent : null,
+                notes: notes
+            });
+        }
+
+        // Load day data (placeholder)
+        function loadDayData() {
+            // Reset selections
+            document.querySelectorAll('.mood-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelectorAll('.symptom-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelectorAll('.flow-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelector('.notes-textarea').value = '';
+
+            // Here you would load saved data for the selected date
+            // For demo purposes, we'll set some default selections
+            if (currentDate.toDateString() === today.toDateString()) {
+                document.querySelector('.mood-item:nth-child(3)').classList.add('selected');
+                document.querySelector('.symptom-item:nth-child(1)').classList.add('selected');
+                document.querySelector('.symptom-item:nth-child(3)').classList.add('selected');
+                document.querySelector('.flow-item:nth-child(3)').classList.add('selected');
+            }
+        }
+
+        // Initialize
+        updateDateDisplay();
+    </script>
+</body>
+</html>

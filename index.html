@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTIMITY - Cycle & Health Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F4E4E6;
+            color: #333;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Conteneur du périphérique mobile */
+        .device-container {
+            position: relative;
+            width: 375px;
+            height: 760px;
+            background: #111;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Boutons du périphérique */
+        .device-button {
+            position: absolute;
+            width: 3px;
+            height: 50px;
+            background: #222;
+            right: -3px;
+            top: 120px;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+
+        .device-button.volume-up {
+            top: 120px;
+        }
+
+        .device-button.volume-down {
+            top: 180px;
+        }
+
+        .device-button.power {
+            top: 240px;
+            height: 70px;
+        }
+
+        /* Écran du périphérique */
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Encoche du périphérique */
+        .device-notch {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            background: #111;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Container mobile */
+        .mobile-container {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;
+            padding-bottom: 70px; /* Espace pour la barre de navigation */
+        }
+
+        .mobile-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #8B5A83;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B5A83 0%, #FF6B8A 100%);
+            color: white;
+            padding: 16px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .profile-icon {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-icon:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        /* Cycle Status Card */
+        .cycle-status {
+            background: white;
+            margin: 16px 20px;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(139, 90, 131, 0.1);
+            text-align: center;
+        }
+
+        .cycle-day {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FF6B8A;
+            margin-bottom: 8px;
+        }
+
+        .cycle-phase {
+            font-size: 18px;
+            color: #8B5A83;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .cycle-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .cycle-progress {
+            width: 100%;
+            height: 8px;
+            background: #F4E4E6;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .cycle-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 4px;
+            width: 65%;
+            transition: width 0.3s ease;
+        }
+
+        .next-event {
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            padding: 0 20px;
+            margin-bottom: 24px;
+        }
+
+        .quick-actions h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #8B5A83;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(139, 90, 131, 0.15);
+            border-color: #FF6B8A;
+        }
+
+        .action-card.active {
+            border-color: #FF6B8A;
+            background: #FFF8F9;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e7e1e1;
+            margin-bottom: 4px;
+        }
+
+        .action-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Calendar Section */
+        .calendar-section {
+            padding: 0 20px;
+            margin-bottom: 24px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .calendar-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8B5A83;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-nav button {
+            background: #F4E4E6;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav button:hover {
+            background: #FF6B8A;
+            color: white;
+        }
+
+        /* Nouveau style de calendrier plus compact */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            background: linear-gradient(135deg, #F4E4E6 0%, #FFF8F9 100%);
+            padding: 12px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(139, 90, 131, 0.15);
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            width: 100%;
+            height: auto;
+            min-width: 30px;
+            min-height: 30px;
+        }
+
+        .calendar-day.header {
+            font-weight: 600;
+            color: #8B5A83;
+            cursor: default;
+            background: transparent;
+        }
+
+        .calendar-day:not(.header):not(:empty) {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .calendar-day:not(.header):not(:empty):hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(139, 90, 131, 0.2);
+            z-index: 2;
+        }
+
+        .calendar-day.today {
+            background: #FF6B8A;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.3);
+            z-index: 1;
+            animation: pulseToday 2s infinite;
+        }
+
+        .calendar-day.period {
+            background: #8B5A83;
+            color: white;
+            box-shadow: 0 4px 10px rgba(139, 90, 131, 0.3);
+        }
+
+        .calendar-day.fertile {
+            background: #FFE4E1;
+            color: #FF6B8A;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(255, 228, 225, 0.5);
+        }
+
+        .calendar-day.ovulation {
+            background: #FF6B8A;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.3);
+            animation: pulseOvulation 2s infinite;
+        }
+
+        .calendar-day.ovulation::after {
+            content: '●';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 6px;
+            color: white;
+        }
+
+        /* Légende du calendrier */
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .legend-color.today {
+            background: #FF6B8A;
+            box-shadow: 0 0 5px rgba(255, 107, 138, 0.5);
+        }
+
+        .legend-color.period {
+            background: #8B5A83;
+        }
+
+        .legend-color.fertile {
+            background: #FFE4E1;
+            border: 1px solid #FF6B8A;
+        }
+
+        .legend-color.ovulation {
+            background: #FF6B8A;
+            position: relative;
+        }
+
+        .legend-color.ovulation::after {
+            content: '●';
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            font-size: 6px;
+            color: white;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        /* Style puzzle pour la barre de navigation */
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 15px;
+            background: white;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #8B5A83; /* Prune Sophistiquée pour l'état inactif */
+            font-size: 10px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-item.active {
+            color: #FF6B8A; /* Corail Moderne pour l'état actif */
+            background: rgba(255, 107, 138, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.2);
+        }
+
+        .nav-item:hover {
+            color: #FF6B8A;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseToday {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 138, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 107, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 138, 0); }
+        }
+
+        @keyframes pulseOvulation {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 138, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(255, 107, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 138, 0); }
+        }
+
+        .cycle-status {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .action-card {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .action-card:nth-child(1) { animation-delay: 0.1s; }
+        .action-card:nth-child(2) { animation-delay: 0.2s; }
+        .action-card:nth-child(3) { animation-delay: 0.3s; }
+        .action-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Animation pour le calendrier */
+        .calendar-grid {
+            animation: fadeInScale 0.5s ease;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animation pour la barre de navigation */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .bottom-nav {
+            animation: slideUp 0.5s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .device-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .device-notch, .device-button {
+                display: none;
+            }
+            
+            .device-screen {
+                border-radius: 0;
+            }
+            
+            .quick-actions, .calendar-section {
+                padding: 0 16px;
+            }
+            
+            .cycle-status {
+                margin: 16px 16px;
+            }
+        }
+
+        /* Haptic feedback simulation */
+        .haptic-feedback {
+            animation: hapticPulse 0.1s ease;
+        }
+
+        @keyframes hapticPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #121212;
+                color: #fff;
+            }
+            
+            .device-container {
+                background: #000;
+            }
+            
+            .mobile-container {
+                background: #1C1C1E;
+            }
+            
+            .cycle-status, .action-card {
+                background: #2C2C2E;
+                color: #fff;
+            }
+            
+            .calendar-grid {
+                background: linear-gradient(135deg, #2C2C2E 0%, #3C3C3E 100%);
+            }
+            
+            .calendar-day:not(.header):not(:empty) {
+                background: #3C3C3E;
+                color: #fff;
+            }
+            
+            .calendar-day.header {
+                color: #FF6B8A;
+            }
+            
+            .bottom-nav, .bottom-nav::before {
+                background: #2C2C2E;
+                border-top-color: #3C3C3E;
+            }
+            
+            .nav-item {
+                color: #A77A9B; /* Version plus claire de Prune Sophistiquée pour le mode sombre */
+            }
+            
+            .nav-item.active {
+                color: #FF6B8A; /* Corail Moderne reste le même */
+                background: rgba(255, 107, 138, 0.15);
+            }
+
+            .calendar-legend {
+                background: rgba(44, 44, 46, 0.7);
+                color: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="device-container">
+        <!-- Boutons du périphérique -->
+        <div class="device-button volume-up"></div>
+        <div class="device-button volume-down"></div>
+        <div class="device-button power"></div>
+        
+        <!-- Encoche du périphérique -->
+        <div class="device-notch"></div>
+        
+        <!-- Écran du périphérique -->
+        <div class="device-screen">
+            <div class="mobile-container">
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 🔋</span>
+                </div>
+
+                <!-- Header -->
+                <div class="header">
+                    <div class="profile-icon" onclick="showProfile()">
+                        <span>👤</span>
+                    </div>
+                    <h1>INTIMITY</h1>
+                    <div class="subtitle">Votre cycle en toute sérénité</div>
+                </div>
+
+                <!-- Cycle Status Card -->
+                <div class="cycle-status">
+                    <div class="cycle-day">14</div>
+                    <div class="cycle-phase">Phase Folliculaire</div>
+                    <div class="cycle-description">Votre énergie augmente progressivement</div>
+                    <div class="cycle-progress">
+                        <div class="cycle-progress-fill"></div>
+                    </div>
+                    <div class="next-event">Ovulation dans 3 jours</div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3>Actions rapides</h3>
+                    <div class="actions-grid">
+                        <div class="action-card" onclick="window.location.href='Journal.html'">
+                            <div class="action-icon">❤️</div>
+                            <div class="action-title">Noter mes symptômes</div>
+                            <div class="action-subtitle">Journal de santé</div>
+                        </div>
+                        <div class="action-card" onclick="window.location.href='calendrier.html'">
+                            <div class="action-icon">📅</div>
+                            <div class="action-title">Voir mon cycle</div>
+                            <div class="action-subtitle">Calendrier</div>
+                        </div>
+                        <div class="action-card" onclick="window.location.href='assistant.html'">
+                            <div class="action-icon">💬</div>
+                            <div class="action-title">Demander à l'IA</div>
+                            <div class="action-subtitle">Assistant</div>
+                        </div>
+                        <div class="action-card" onclick="logSymptom('notifications')">
+                            <div class="action-icon">🔔</div>
+                            <div class="action-title">Mes rappels</div>
+                            <div class="action-subtitle">Notifications</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar -->
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <h3>Juillet 2025</h3>
+                        <div class="calendar-nav">
+                            <button onclick="previousMonth()">‹</button>
+                            <button onclick="nextMonth()">›</button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid">
+                        <!-- Calendar Headers -->
+                        <div class="calendar-day header">D</div>
+                        <div class="calendar-day header">L</div>
+                        <div class="calendar-day header">M</div>
+                        <div class="calendar-day header">M</div>
+                        <div class="calendar-day header">J</div>
+                        <div class="calendar-day header">V</div>
+                        <div class="calendar-day header">S</div>
+                        
+                        <!-- Calendar Days -->
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day">1</div>
+                        <div class="calendar-day">2</div>
+                        <div class="calendar-day period">3</div>
+                        <div class="calendar-day period">4</div>
+                        <div class="calendar-day period">5</div>
+                        <div class="calendar-day">6</div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day">8</div>
+                        <div class="calendar-day">9</div>
+                        <div class="calendar-day today">10</div>
+                        <div class="calendar-day">11</div>
+                        <div class="calendar-day">12</div>
+                        <div class="calendar-day ovulation">13</div>
+                        <div class="calendar-day fertile">14</div>
+                        <div class="calendar-day fertile">15</div>
+                        <div class="calendar-day fertile">16</div>
+                        <div class="calendar-day">17</div>
+                        <div class="calendar-day">18</div>
+                        <div class="calendar-day">19</div>
+                        <div class="calendar-day">20</div>
+                        <div class="calendar-day">21</div>
+                        <div class="calendar-day">22</div>
+                        <div class="calendar-day">23</div>
+                        <div class="calendar-day">24</div>
+                        <div class="calendar-day">25</div>
+                        <div class="calendar-day">26</div>
+                        <div class="calendar-day">27</div>
+                        <div class="calendar-day">28</div>
+                        <div class="calendar-day">29</div>
+                        <div class="calendar-day">30</div>
+                        <div class="calendar-day">31</div>
+                    </div>
+                    
+                    <!-- Légende du calendrier -->
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-color today"></div>
+                            <span>Aujourd'hui</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color period"></div>
+                            <span>Règles</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color fertile"></div>
+                            <span>Fertile</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color ovulation"></div>
+                            <span>Ovulation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation (déplacée dans le device-screen) -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item" onclick="showTab('calendar')">
+                    <div class="nav-icon">📅</div>
+                    <span>Calendrier</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showTab('journal')">
+                    <div class="nav-icon">❤️</div>
+                    <span>Journal</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showTab('assistant')">
+                    <div class="nav-icon">💬</div>
+                    <span>Assistant</span>
+                </a>
+                <a href="#" class="nav-item active" onclick="showTab('profile')">
+                    <div class="nav-icon">👤</div>
+                    <span>Profil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Haptic feedback simulation
+        function hapticFeedback(element) {
+            element.classList.add('haptic-feedback');
+            setTimeout(() => {
+                element.classList.remove('haptic-feedback');
+            }, 100);
+        }
+
+        // Log symptom function
+        function logSymptom(type) {
+            const element = event.target.closest('.action-card');
+            hapticFeedback(element);
+            element.classList.add('active');
+            
+            setTimeout(() => {
+                element.classList.remove('active');
+            }, 500);
+            
+            // Simulate logging
+            console.log(`Logging ${type} symptom`);
+            
+            // Show confirmation
+            const title = element.querySelector('.action-title').textContent;
+            showNotification(`${title} enregistré avec succès!`);
+        }
+
+        // Show profile function
+        function showProfile() {
+            const profileIcon = event.target.closest('.profile-icon');
+            hapticFeedback(profileIcon);
+            showNotification('Profil ouvert');
+        }
+
+        // Calendar navigation
+        function previousMonth() {
+            const btn = event.target;
+            hapticFeedback(btn);
+            console.log('Previous month');
+            showNotification('Mois précédent');
+            
+            // Animation du calendrier
+            const calendar = document.querySelector('.calendar-grid');
+            calendar.style.opacity = '0';
+            calendar.style.transform = 'translateX(20px)';
+            
+            setTimeout(() => {
+                calendar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                calendar.style.opacity = '1';
+                calendar.style.transform = 'translateX(0)';
+            }, 300);
+        }
+
+        function nextMonth() {
+            const btn = event.target;
+            hapticFeedback(btn);
+            console.log('Next month');
+            showNotification('Mois suivant');
+            
+            // Animation du calendrier
+            const calendar = document.querySelector('.calendar-grid');
+            calendar.style.opacity = '0';
+            calendar.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                calendar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                calendar.style.opacity = '1';
+                calendar.style.transform = 'translateX(0)';
+            }, 300);
+        }
+
+        // Bottom navigation
+        function showTab(tab) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeItem = event.target.closest('.nav-item');
+            activeItem.classList.add('active');
+            hapticFeedback(activeItem);
+            
+            // Animation de la barre de navigation (effet puzzle)
+            const bottomNav = document.querySelector('.bottom-nav');
+            bottomNav.style.transform = 'translateY(5px)';
+            
+            setTimeout(() => {
+                bottomNav.style.transform = 'translateY(0)';
+            }, 200);
+            
+            let message = "";
+            switch(tab) {
+                case 'calendar':
+                    message = "Calendrier du cycle ouvert";
+                    break;
+                case 'journal':
+                    message = "Journal de santé ouvert";
+                    break;
+                case 'assistant':
+                    message = "Assistant IA activé";
+                    break;
+                case 'profile':
+                    message = "Profil utilisateur ouvert";
+                    break;
+                default:
+                    message = `Onglet ${tab} ouvert`;
+            }
+            
+            showNotification(message);
+        }
+
+        // Notification system
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 20px;
+                font-size: 14px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                max-width: 300px;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 100);
+            
+            // Remove after delay
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        // Calendar day click handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarDays = document.querySelectorAll('.calendar-day:not(.header)');
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    if (this.textContent.trim()) {
+                        hapticFeedback(this);
+                        showNotification(`Jour ${this.textContent} sélectionné`);
+                    }
+                });
+            });
+        });
+
+        // Simulate cycle progress update
+        function updateCycleProgress() {
+            const progressBar = document.querySelector('.cycle-progress-fill');
+            const currentDay = parseInt(document.querySelector('.cycle-day').textContent);
+            const progress = (currentDay / 28) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCycleProgress();
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                document.querySelector('.status-bar span').textContent = timeString;
+            }, 1000);
+            
+            // Effet de défilement pour la barre de navigation
+            const mobileContainer = document.querySelector('.mobile-container');
+            let lastScrollTop = 0;
+            
+            mobileContainer.addEventListener('scroll', function() {
+                const st = this.scrollTop;
+                const bottomNav = document.querySelector('.bottom-nav');
+                
+                if (st > lastScrollTop && st > 100) {
+                    // Défilement vers le bas
+                    bottomNav.style.transform = 'translateY(70px)';
+                } else {
+                    // Défilement vers le haut
+                    bottomNav.style.transform = 'translateY(0)';
+                }
+                
+                lastScrollTop = st <= 0 ? 0 : st;
+            });
+        });
+
+        // Add touch gestures simulation
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
+            
+            // Swipe gestures
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 50) {
+                    // Swipe left
+                    nextMonth();
+                } else if (diffX < -50) {
+                    // Swipe right
+                    previousMonth();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

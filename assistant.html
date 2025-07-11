@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTIMITY - Assistant IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #121212;
+            color: #fff;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Conteneur du périphérique mobile */
+        .device-container {
+            position: relative;
+            width: 375px;
+            height: 760px;
+            background: #000;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Boutons du périphérique */
+        .device-button {
+            position: absolute;
+            width: 3px;
+            height: 50px;
+            background: #222;
+            right: -3px;
+            top: 120px;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+
+        .device-button.volume-up {
+            top: 120px;
+        }
+
+        .device-button.volume-down {
+            top: 180px;
+        }
+
+        .device-button.power {
+            top: 240px;
+            height: 70px;
+        }
+
+        /* Écran du périphérique */
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: #1C1C1E;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Encoche du périphérique */
+        .device-notch {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            background: #000;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Container mobile */
+        .mobile-container {
+            width: 100%;
+            height: calc(100% - 70px); /* Réduire la hauteur pour laisser de la place à la barre de navigation */
+            background: #1f1f1f;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 0;
+            scroll-behavior: smooth;
+        }
+
+        .mobile-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #8B5A83;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B5A83 0%, #FF6B8A 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 18px;
+            margin-right: 16px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-title .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .messages-area::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            background: linear-gradient(135deg, #2C2C2E 0%, #3C3C3E 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 107, 138, 0.2);
+        }
+
+        .welcome-message .ai-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .welcome-message h3 {
+            color: #FF6B8A;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-message p {
+            color: #A77A9B;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Quick Questions */
+        .quick-questions {
+            margin-bottom: 20px;
+        }
+
+        .quick-questions h4 {
+            color: #FF6B8A;
+            font-size: 16px;
+            margin-bottom: 12px;
+            padding-left: 8px;
+        }
+
+        .question-card {
+            background: #2C2C2E;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 107, 138, 0.1);
+        }
+
+        .question-card:hover {
+            background: #3C3C3E;
+            border-color: #FF6B8A;
+            transform: translateY(-2px);
+        }
+
+        .question-card .question-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .question-card .question-text {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Message */
+        .message {
+            margin-bottom: 16px;
+            animation: slideInUp 0.4s ease;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message.ai {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.ai .message-content {
+            background: #2C2C2E;
+            color: #fff;
+            border-bottom-left-radius: 6px;
+            border: 1px solid rgba(255, 107, 138, 0.1);
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.ai .message-time {
+            text-align: left;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #2C2C2E;
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+            max-width: 85%;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 107, 138, 0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #FF6B8A;
+            border-radius: 50%;
+            animation: typingDot 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingDot {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        /* Input Area */
+        .input-area {
+            background: #2C2C2E;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 107, 138, 0.1);
+            flex-shrink: 0;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-field {
+            flex: 1;
+            background: #3C3C3E;
+            border: 1px solid rgba(255, 107, 138, 0.2);
+            border-radius: 20px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #FF6B8A;
+            box-shadow: 0 0 0 3px rgba(255, 107, 138, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: #A77A9B;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 18px;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 107, 138, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            width: 375px;
+            max-width: 100%;
+            background: #2C2C2E;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 15px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            transition: transform 0.5s ease, bottom 0.5s ease;
+            will-change: transform, bottom;
+        }
+
+        .bottom-nav.visible {
+            bottom: 0;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex: 1;
+            color: #8B5A83; /* Prune Sophistiquée pour inactif */
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 200ms ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item.active {
+            color: #FF6B8A; /* Corail Moderne pour actif */
+        }
+        
+        .nav-item:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.3);
+            outline-offset: 2px;
+        }
+        
+        .material-icons {
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: all 200ms ease;
+        }
+        
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+        }
+        
+        /* Indicateur de défilement */
+        .navigation-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 1;
+            transition: opacity 300ms ease;
+            z-index: 999;
+        }
+        
+        .navigation-prompt.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Haptic feedback */
+        .haptic-feedback {
+            animation: hapticPulse 0.1s ease;
+        }
+
+        @keyframes hapticPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .device-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .device-notch, .device-button {
+                display: none;
+            }
+            
+            .device-screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="device-container">
+        <!-- Boutons du périphérique -->
+        <div class="device-button volume-up"></div>
+        <div class="device-button volume-down"></div>
+        <div class="device-button power"></div>
+        
+        <!-- Encoche du périphérique -->
+        <div class="device-notch"></div>
+        
+        <!-- Écran du périphérique -->
+        <div class="device-screen">
+            <div class="mobile-container">
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 🔋</span>
+                </div>
+
+                <!-- Header -->
+                <div class="header">
+                    <button class="back-btn" onclick="window.location.href='index.html'">
+                        <span>←</span>
+                    </button>
+                    <div class="header-title">
+                        <h1>Assistant IA</h1>
+                        <div class="subtitle">Votre guide santé personnalisé</div>
+                    </div>
+                    <div class="status-indicator"></div>
+                </div>
+
+                <!-- Chat Container -->
+                <div class="chat-container">
+                    <!-- Messages Area -->
+                    <div class="messages-area" id="messagesArea">
+                        <!-- Welcome Message -->
+                        <div class="welcome-message">
+                            <div class="ai-avatar">🤖</div>
+                            <h3>Bonjour ! Je suis votre assistant IA</h3>
+                            <p>Je suis là pour répondre à toutes vos questions sur la santé menstruelle, la contraception et vos symptômes. N'hésitez pas à me poser vos questions !</p>
+                        </div>
+
+                        <!-- Quick Questions -->
+                        <div class="quick-questions">
+                            <h4>Questions fréquentes</h4>
+                            <div class="question-card" onclick="askQuestion('Quels sont les signes de l\'ovulation ?')">
+                                <span class="question-icon">🥚</span>
+                                <span class="question-text">Quels sont les signes de l'ovulation ?</span>
+                            </div>
+                            <div class="question-card" onclick="askQuestion('Comment calculer mon cycle menstruel ?')">
+                                <span class="question-icon">📊</span>
+                                <span class="question-text">Comment calculer mon cycle menstruel ?</span>
+                            </div>
+                            <div class="question-card" onclick="askQuestion('Quelles sont les méthodes contraceptives ?')">
+                                <span class="question-icon">💊</span>
+                                <span class="question-text">Quelles sont les méthodes contraceptives ?</span>
+                            </div>
+                            <div class="question-card" onclick="askQuestion('Que faire en cas de règles douloureuses ?')">
+                                <span class="question-icon">💔</span>
+                                <span class="question-text">Que faire en cas de règles douloureuses ?</span>
+                            </div>
+                        </div>
+
+                        <!-- Messages will be added here dynamically -->
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="input-area">
+                        <div class="input-container">
+                            <input type="text" class="input-field" id="messageInput" placeholder="Tapez votre question ici...">
+                            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                                <span>➤</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Barre de navigation -->
+            <div class="bottom-nav">
+                <a href="calendrier.html" class="nav-item" onclick="showTab('calendar')">
+                    <i class="nav-icon">📅</i>
+                    Calendrier
+                </a>
+                <a href="Journal.html" class="nav-item" onclick="showTab('journal')">
+                    <i class="nav-icon">📔</i>
+                    Journal
+                </a>
+                <a href="assistant.html" class="nav-item active" onclick="showTab('assistant')">
+                    <i class="nav-icon">🤖</i>
+                    Assistant
+                </a>
+                <a href="profile.html" class="nav-item" onclick="showTab('profile')">
+                    <i class="nav-icon">👤</i>
+                    Profil
+                </a>
+            </div>
+            
+            <div class="navigation-prompt" role="alert" aria-hidden="true">
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de l'affichage de la barre de navigation au défilement
+        document.addEventListener('DOMContentLoaded', function() {
+            const navBar = document.querySelector('.nav-bar');
+            const mobileContainer = document.querySelector('.mobile-container');
+            const scrollHint = document.querySelector('.navigation-prompt');
+            let lastScrollTop = 0;
+            let isScrolling = false;
+            let scrollTimeout;
+            let hintTimeout;
+            
+            // Détection de la plateforme (iOS/Android)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            // Mettre à jour les icônes en fonction de la plateforme
+            function updateIcons() {
+                const calendarIcon = document.querySelector('[aria-label="Calendrier"] .material-icons');
+                const journalIcon = document.querySelector('[aria-label="Journal"] .material-icons');
+                const assistantIcon = document.querySelector('[aria-label="Assistant IA"] .material-icons');
+                const profileIcon = document.querySelector('[aria-label="Profil"] .material-icons');
+                
+                if (isIOS) {
+                    calendarIcon.textContent = 'calendar';
+                    journalIcon.textContent = 'favorite';
+                    assistantIcon.textContent = 'chat_bubble';
+                    profileIcon.textContent = 'person';
+                }
+            }
+
+            // Fonction pour gérer le défilement avec animation fluide
+            function handleScroll() {
+                if (isScrolling) return;
+                isScrolling = true;
+                
+                const st = mobileContainer.scrollTop || document.documentElement.scrollTop;
+                const isScrollingDown = st > lastScrollTop;
+                
+                // Animation d'apparition/disparition de l'indicateur
+                if (st > 100 && isScrollingDown) {
+                    if (scrollHint) scrollHint.classList.add('hidden');
+                    navBar.style.transform = 'translateX(-50%) translateY(0)';
+                    navBar.classList.add('visible');
+                } else if (st <= 100 || !isScrollingDown) {
+                    navBar.style.transform = 'translateX(-50%) translateY(0)';
+                    navBar.classList.add('visible');
+                }
+                
+                lastScrollTop = st <= 0 ? 0 : st;
+                
+                // Cacher la barre après un délai d'inactivité
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (st > 100) {
+                        navBar.style.transform = 'translateX(-50%) translateY(100%)';
+                        setTimeout(() => {
+                            navBar.classList.remove('visible');
+                        }, 300);
+                    }
+                    isScrolling = false;
+                }, 2000);
+                
+                // Réinitialiser l'état de défilement
+                requestAnimationFrame(() => {
+                    isScrolling = false;
+                });
+            }
+            
+            // Fonction pour gérer le toucher
+            function handleTouchMove(e) {
+                if (e.touches.length === 1) {
+                    handleScroll();
+                }
+            }
+            
+            // Initialisation
+            function initNavigation() {
+                updateIcons();
+                
+                // Masquer l'indicateur après 5 secondes
+                if (scrollHint) {
+                    hintTimeout = setTimeout(() => {
+                        scrollHint.classList.add('hidden');
+                    }, 5000);
+                    
+                    // Réinitialiser le timer d'inactivité de l'indicateur
+                    document.addEventListener('mousemove', () => {
+                        clearTimeout(hintTimeout);
+                        scrollHint.classList.remove('hidden');
+                        hintTimeout = setTimeout(() => {
+                            scrollHint.classList.add('hidden');
+                        }, 5000);
+                    });
+                }
+                
+                // Gestion des événements tactiles
+                if (mobileContainer) {
+                    mobileContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
+                    mobileContainer.addEventListener('scroll', handleScroll, { passive: true });
+                }
+            }
+            
+            // Démarrer l'initialisation de la navigation
+            initNavigation();
+        });
+        
+        // Variables globales
+        let isTyping = false;
+        const messagesArea = document.getElementById('messagesArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        // Responses de l'IA
+        const aiResponses = {
+            'ovulation': 'Les signes de l\'ovulation incluent : une augmentation de la température corporelle, des changements dans la glaire cervicale (plus transparente et élastique), des douleurs pelviennes légères, et parfois des spottings. Ces signes apparaissent généralement 14 jours avant vos prochaines règles.',
+            'cycle': 'Pour calculer votre cycle menstruel, comptez du premier jour de vos règles jusqu\'au premier jour des règles suivantes. Un cycle normal varie entre 21 et 35 jours, avec une moyenne de 28 jours. L\'ovulation se produit généralement 14 jours avant vos prochaines règles.',
+            'contraception': 'Il existe plusieurs méthodes contraceptives : la pilule contraceptive, le DIU (stérilet), l\'implant, le patch, l\'anneau vaginal, les préservatifs, et les méthodes naturelles. Chaque méthode a ses avantages et inconvénients. Je recommande de consulter un professionnel de santé pour choisir la méthode qui vous convient le mieux.',
+            'douleurs': 'Pour soulager les règles douloureuses, vous pouvez : appliquer de la chaleur sur le bas-ventre, prendre des anti-inflammatoires, faire de l\'exercice léger, pratiquer la relaxation, et maintenir une alimentation équilibrée. Si les douleurs sont très intenses, consultez un médecin.',
+            'default': 'Merci pour votre question ! C\'est un sujet important concernant la santé féminine. Je vous recommande de consulter un professionnel de santé pour des conseils personnalisés. En attendant, n\'hésitez pas à me poser d\'autres questions sur votre cycle ou vos symptômes.'
+        };
+
+        // Haptic feedback
+        function hapticFeedback(element) {
+            element.classList.add('haptic-feedback');
+            setTimeout(() => {
+                element.classList.remove('haptic-feedback');
+            }, 100);
+        }
+
+        // Créer un message
+        function createMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fr-FR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${text}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            return messageDiv;
+        }
+
+        // Créer l'indicateur de frappe
+        function createTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            return typingDiv;
+        }
+
+        // Obtenir la réponse de l'IA
+        function getAIResponse(question) {
+            const lowerQuestion = question.toLowerCase();
+            
+            if (lowerQuestion.includes('ovulation') || lowerQuestion.includes('ovule')) {
+                return aiResponses.ovulation;
+            } else if (lowerQuestion.includes('cycle') || lowerQuestion.includes('calculer')) {
+                return aiResponses.cycle;
+            } else if (lowerQuestion.includes('contraception') || lowerQuestion.includes('contraceptif') || lowerQuestion.includes('pilule')) {
+                return aiResponses.contraception;
+            } else if (lowerQuestion.includes('douleur') || lowerQuestion.includes('mal') || lowerQuestion.includes('règles douloureuses')) {
+                return aiResponses.douleurs;
+            } else {
+                return aiResponses.default;
+            }
+        }
+
+        // Envoyer un message
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isTyping) return;
+            
+            // Ajouter le message de l'utilisateur
+            const userMessage = createMessage(message, true);
+            messagesArea.appendChild(userMessage);
+            
+            // Vider le champ de saisie
+            messageInput.value = '';
+            
+            // Faire défiler vers le bas
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            // Simuler la réponse de l'IA
+            setTimeout(() => {
+                isTyping = true;
+                
+                // Ajouter l'indicateur de frappe
+                const typingIndicator = createTypingIndicator();
+                messagesArea.appendChild(typingIndicator);
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+                
+                // Simuler le temps de réponse
+                setTimeout(() => {
+                    // Supprimer l'indicateur de frappe
+                    messagesArea.removeChild(typingIndicator);
+                    
+                    // Ajouter la réponse de l'IA
+                    const aiResponse = getAIResponse(message);
+                    const aiMessage = createMessage(aiResponse, false);
+                    messagesArea.appendChild(aiMessage);
+                    
+                    // Faire défiler vers le bas
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                    
+                    isTyping = false;
+                }, 1500 + Math.random() * 1000);
+            }, 500);
+            
+            // Haptic feedback
+            hapticFeedback(sendBtn);
+        }
+
+        // Poser une question prédéfinie
+        function askQuestion(question) {
+            const questionCard = event.target.closest('.question-card');
+            hapticFeedback(questionCard);
+            
+            // Remplir le champ de saisie
+            messageInput.value = question;
+            
+            // Envoyer automatiquement
+            setTimeout(() => {
+                sendMessage();
+            }, 200);
+        }
+
+        // Retour en arrière
+        function goBack() {
+            hapticFeedback(document.querySelector('.back-btn'));
+            showNotification('Retour à l\'accueil');
+        }
+
+        // Navigation
+        function showTab(tab) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeItem = event.target.closest('.nav-item');
+            activeItem.classList.add('active');
+            hapticFeedback(activeItem);
+            
+            let message = "";
+            switch(tab) {
+                case 'calendar':
+                    message = "Calendrier du cycle ouvert";
+                    break;
+                case 'journal':
+                    message = "Journal de santé ouvert";
+                    break;
+                case 'assistant':
+                    notification.innerHTML = 
+                    tabName === 'assistant' 
+                    ? 'Redirection vers l\'assistant IA...' 
+                    : '';
+                    break;
+                case 'profile':
+                    message = "Profil utilisateur ouvert";
+                    break;
+            }
+            
+            showNotification(message);
+        }
+
+        // Système de notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 20px;
+                font-size: 14px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                max-width: 300px;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        // Gestion des événements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de la touche Entrée
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Gestion de la saisie
+            messageInput.addEventListener('input', function() {
+                sendBtn.disabled = !this.value.trim();
+            });
+            
+            // Mise à jour de l'heure
+            setInterval(() => {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                document.querySelector('.status-bar span').textContent = timeString;
+            }, 1000);
+            
+            // Auto-scroll pour les nouveaux messages
+            const observer = new MutationObserver(() => {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            });
+            
+            observer.observe(messagesArea, { childList: true });
+        });
+    </script>
+</body>
+</html>
