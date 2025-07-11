@@ -455,75 +455,6 @@
             color: white;
         }
 
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-            z-index: 100;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-        }
-
-        /* Style puzzle pour la barre de navigation */
-        .bottom-nav::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 15px;
-            background: white;
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #8B5A83; /* Prune Sophistiquée pour l'état inactif */
-            font-size: 10px;
-            transition: all 0.3s ease;
-            padding: 8px 12px;
-            border-radius: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .nav-item.active {
-            color: #FF6B8A; /* Corail Moderne pour l'état actif */
-            background: rgba(255, 107, 138, 0.1);
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.2);
-        }
-
-        .nav-item:hover {
-            color: #FF6B8A;
-            transform: translateY(-2px);
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
         /* Animations */
         @keyframes fadeInUp {
             from {
@@ -585,10 +516,6 @@
             to {
                 transform: translateY(0);
             }
-        }
-
-        .bottom-nav {
-            animation: slideUp 0.5s ease;
         }
 
         /* Responsive */
@@ -660,24 +587,78 @@
                 color: #FF6B8A;
             }
             
-            .bottom-nav, .bottom-nav::before {
-                background: #2C2C2E;
-                border-top-color: #3C3C3E;
-            }
-            
-            .nav-item {
-                color: #A77A9B; /* Version plus claire de Prune Sophistiquée pour le mode sombre */
-            }
-            
-            .nav-item.active {
-                color: #FF6B8A; /* Corail Moderne reste le même */
-                background: rgba(255, 107, 138, 0.15);
-            }
-
             .calendar-legend {
                 background: rgba(44, 44, 46, 0.7);
                 color: #fff;
             }
+        }
+
+        /* Bouton et menu flottants */
+        .floating-menu-btn {
+            position: absolute; /* Changé de fixed à absolute */
+            bottom: 20px; /* Ajusté pour être dans l'écran du device */
+            right: 20px; /* Ajusté pour être dans l'écran du device */
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1001; /* Au-dessus du contenu mais en dessous du menu si ouvert */
+            transition: transform 0.3s ease;
+        }
+
+        .floating-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        .floating-menu {
+            position: absolute; /* Changé de fixed à absolute */
+            bottom: 90px; /* Ajusté pour être au-dessus du bouton dans l'écran du device */
+            right: 20px; /* Ajusté pour être dans l'écran du device */
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            z-index: 1000; /* En dessous du bouton pour l'animation d'ouverture */
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: none; /* Caché par défaut */
+        }
+
+        .floating-menu.visible {
+            display: block; /* Affiché par JS */
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            z-index: 1002; /* Au-dessus de tout quand ouvert */
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .menu-item.active {
+            color: #FF6B8A;
+            font-weight: 600;
+            background-color: rgba(255, 107, 138, 0.1);
         }
     </style>
 </head>
@@ -824,26 +805,20 @@
                 </div>
             </div>
             
-            <!-- Bottom Navigation (déplacée dans le device-screen) -->
-            <div class="bottom-nav">
-                <a href="#" class="nav-item" onclick="showTab('calendar')">
-                    <div class="nav-icon">📅</div>
-                    <span>Calendrier</span>
-                </a>
-                <a href="#" class="nav-item" onclick="showTab('journal')">
-                    <div class="nav-icon">❤️</div>
-                    <span>Journal</span>
-                </a>
-                <a href="#" class="nav-item" onclick="showTab('assistant')">
-                    <div class="nav-icon">💬</div>
-                    <span>Assistant</span>
-                </a>
-                <a href="#" class="nav-item active" onclick="showTab('profile')">
-                    <div class="nav-icon">👤</div>
-                    <span>Profil</span>
-                </a>
-            </div>
         </div>
+    </div>
+
+    <!-- Nouveau bouton flottant -->
+    <div class="floating-menu-btn" onclick="toggleMenu()">
+        <div class="menu-icon">☰</div>
+    </div>
+
+    <div class="floating-menu">
+        <a href="index.html" class="menu-item active">🏠 Accueil</a>
+        <a href="calendrier.html" class="menu-item">📅 Calendrier</a>
+        <a href="Journal.html" class="menu-item">❤️ Journal</a>
+        <a href="assistant.html" class="menu-item">💬 Assistant</a>
+        <a href="profile.html" class="menu-item">👤 Profil</a>
     </div>
 
     <script>
@@ -915,44 +890,6 @@
                 calendar.style.opacity = '1';
                 calendar.style.transform = 'translateX(0)';
             }, 300);
-        }
-
-        // Bottom navigation
-        function showTab(tab) {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            
-            const activeItem = event.target.closest('.nav-item');
-            activeItem.classList.add('active');
-            hapticFeedback(activeItem);
-            
-            // Animation de la barre de navigation (effet puzzle)
-            const bottomNav = document.querySelector('.bottom-nav');
-            bottomNav.style.transform = 'translateY(5px)';
-            
-            setTimeout(() => {
-                bottomNav.style.transform = 'translateY(0)';
-            }, 200);
-            
-            let message = "";
-            switch(tab) {
-                case 'calendar':
-                    message = "Calendrier du cycle ouvert";
-                    break;
-                case 'journal':
-                    message = "Journal de santé ouvert";
-                    break;
-                case 'assistant':
-                    message = "Assistant IA activé";
-                    break;
-                case 'profile':
-                    message = "Profil utilisateur ouvert";
-                    break;
-                default:
-                    message = `Onglet ${tab} ouvert`;
-            }
-            
-            showNotification(message);
         }
 
         // Notification system
@@ -1028,29 +965,30 @@
                 document.querySelector('.status-bar span').textContent = timeString;
             }, 1000);
             
-            // Effet de défilement pour la barre de navigation
-            const mobileContainer = document.querySelector('.mobile-container');
-            let lastScrollTop = 0;
-            
-            mobileContainer.addEventListener('scroll', function() {
-                const st = this.scrollTop;
-                const bottomNav = document.querySelector('.bottom-nav');
-                
-                if (st > lastScrollTop && st > 100) {
-                    // Défilement vers le bas
-                    bottomNav.style.transform = 'translateY(70px)';
-                } else {
-                    // Défilement vers le haut
-                    bottomNav.style.transform = 'translateY(0)';
-                }
-                
-                lastScrollTop = st <= 0 ? 0 : st;
-            });
         });
 
         // Add touch gestures simulation
         let touchStartX = 0;
         let touchStartY = 0;
+
+        // Floating menu toggle
+        function toggleMenu() {
+            const menu = document.querySelector('.floating-menu');
+            const menuBtn = document.querySelector('.floating-menu-btn');
+            menu.classList.toggle('visible');
+            // Optional: Add a class to the button when menu is open for different icon or style
+            menuBtn.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.floating-menu');
+            const menuBtn = document.querySelector('.floating-menu-btn');
+            if (menu && menu.classList.contains('visible') && !menuBtn.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('visible');
+                menuBtn.classList.remove('active');
+            }
+        });
 
         document.addEventListener('touchstart', function(e) {
             touchStartX = e.touches[0].clientX;

@@ -422,68 +422,6 @@
             transform: none;
         }
 
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(0);
-            width: 375px;
-            max-width: 100%;
-            background: #2C2C2E;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 15px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            transition: transform 0.5s ease, bottom 0.5s ease;
-            will-change: transform, bottom;
-        }
-
-        .bottom-nav.visible {
-            bottom: 0;
-            transform: translateX(-50%) translateY(0);
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            flex: 1;
-            color: #8B5A83; /* Prune Sophistiquée pour inactif */
-            text-decoration: none;
-            font-size: 10px;
-            font-weight: 500;
-            transition: all 200ms ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-item.active {
-            color: #FF6B8A; /* Corail Moderne pour actif */
-        }
-        
-        .nav-item:focus {
-            outline: 2px solid rgba(255, 255, 255, 0.3);
-            outline-offset: 2px;
-        }
-        
-        .material-icons {
-            font-size: 24px;
-            margin-bottom: 4px;
-            transition: all 200ms ease;
-        }
-        
-        .nav-label {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 0.1px;
-        }
-        
         /* Indicateur de défilement */
         .navigation-prompt {
             position: fixed;
@@ -557,6 +495,74 @@
             .device-screen {
                 border-radius: 0;
             }
+        }
+
+        /* Bouton et menu flottants */
+        .floating-menu-btn {
+            position: absolute; /* Changé de fixed à absolute */
+            bottom: 20px; /* Ajusté pour être dans l'écran du device */
+            right: 20px; /* Ajusté pour être dans l'écran du device */
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .floating-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        .floating-menu {
+            position: absolute; /* Changé de fixed à absolute */
+            bottom: 90px; /* Ajusté pour être au-dessus du bouton dans l'écran du device */
+            right: 20px; /* Ajusté pour être dans l'écran du device */
+            background: #2C2C2E; /* Darker background for dark theme */
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25); /* Stronger shadow for dark theme */
+            padding: 10px 0;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: none;
+        }
+
+        .floating-menu.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            z-index: 1002;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: #fff; /* Light text for dark theme */
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #3C3C3E; /* Darker hover for dark theme */
+        }
+
+        .menu-item.active {
+            color: #FF6B8A;
+            font-weight: 600;
+            background-color: rgba(255, 107, 138, 0.15); /* Adjusted for dark theme */
         }
     </style>
 </head>
@@ -638,25 +644,6 @@
                 </div>
             </div>
             
-            <!-- Barre de navigation -->
-            <div class="bottom-nav">
-                <a href="calendrier.html" class="nav-item" onclick="showTab('calendar')">
-                    <i class="nav-icon">📅</i>
-                    Calendrier
-                </a>
-                <a href="Journal.html" class="nav-item" onclick="showTab('journal')">
-                    <i class="nav-icon">📔</i>
-                    Journal
-                </a>
-                <a href="assistant.html" class="nav-item active" onclick="showTab('assistant')">
-                    <i class="nav-icon">🤖</i>
-                    Assistant
-                </a>
-                <a href="profile.html" class="nav-item" onclick="showTab('profile')">
-                    <i class="nav-icon">👤</i>
-                    Profil
-                </a>
-            </div>
             
             <div class="navigation-prompt" role="alert" aria-hidden="true">
 
@@ -664,112 +651,20 @@
         </div>
     </div>
 
-    <script>
-        // Gestion de l'affichage de la barre de navigation au défilement
-        document.addEventListener('DOMContentLoaded', function() {
-            const navBar = document.querySelector('.nav-bar');
-            const mobileContainer = document.querySelector('.mobile-container');
-            const scrollHint = document.querySelector('.navigation-prompt');
-            let lastScrollTop = 0;
-            let isScrolling = false;
-            let scrollTimeout;
-            let hintTimeout;
-            
-            // Détection de la plateforme (iOS/Android)
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            // Mettre à jour les icônes en fonction de la plateforme
-            function updateIcons() {
-                const calendarIcon = document.querySelector('[aria-label="Calendrier"] .material-icons');
-                const journalIcon = document.querySelector('[aria-label="Journal"] .material-icons');
-                const assistantIcon = document.querySelector('[aria-label="Assistant IA"] .material-icons');
-                const profileIcon = document.querySelector('[aria-label="Profil"] .material-icons');
-                
-                if (isIOS) {
-                    calendarIcon.textContent = 'calendar';
-                    journalIcon.textContent = 'favorite';
-                    assistantIcon.textContent = 'chat_bubble';
-                    profileIcon.textContent = 'person';
-                }
-            }
+    <!-- Nouveau bouton flottant -->
+    <div class="floating-menu-btn" onclick="toggleMenu()">
+        <div class="menu-icon">☰</div>
+    </div>
 
-            // Fonction pour gérer le défilement avec animation fluide
-            function handleScroll() {
-                if (isScrolling) return;
-                isScrolling = true;
-                
-                const st = mobileContainer.scrollTop || document.documentElement.scrollTop;
-                const isScrollingDown = st > lastScrollTop;
-                
-                // Animation d'apparition/disparition de l'indicateur
-                if (st > 100 && isScrollingDown) {
-                    if (scrollHint) scrollHint.classList.add('hidden');
-                    navBar.style.transform = 'translateX(-50%) translateY(0)';
-                    navBar.classList.add('visible');
-                } else if (st <= 100 || !isScrollingDown) {
-                    navBar.style.transform = 'translateX(-50%) translateY(0)';
-                    navBar.classList.add('visible');
-                }
-                
-                lastScrollTop = st <= 0 ? 0 : st;
-                
-                // Cacher la barre après un délai d'inactivité
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    if (st > 100) {
-                        navBar.style.transform = 'translateX(-50%) translateY(100%)';
-                        setTimeout(() => {
-                            navBar.classList.remove('visible');
-                        }, 300);
-                    }
-                    isScrolling = false;
-                }, 2000);
-                
-                // Réinitialiser l'état de défilement
-                requestAnimationFrame(() => {
-                    isScrolling = false;
-                });
-            }
-            
-            // Fonction pour gérer le toucher
-            function handleTouchMove(e) {
-                if (e.touches.length === 1) {
-                    handleScroll();
-                }
-            }
-            
-            // Initialisation
-            function initNavigation() {
-                updateIcons();
-                
-                // Masquer l'indicateur après 5 secondes
-                if (scrollHint) {
-                    hintTimeout = setTimeout(() => {
-                        scrollHint.classList.add('hidden');
-                    }, 5000);
-                    
-                    // Réinitialiser le timer d'inactivité de l'indicateur
-                    document.addEventListener('mousemove', () => {
-                        clearTimeout(hintTimeout);
-                        scrollHint.classList.remove('hidden');
-                        hintTimeout = setTimeout(() => {
-                            scrollHint.classList.add('hidden');
-                        }, 5000);
-                    });
-                }
-                
-                // Gestion des événements tactiles
-                if (mobileContainer) {
-                    mobileContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
-                    mobileContainer.addEventListener('scroll', handleScroll, { passive: true });
-                }
-            }
-            
-            // Démarrer l'initialisation de la navigation
-            initNavigation();
-        });
-        
+    <div class="floating-menu">
+        <a href="index.html" class="menu-item">🏠 Accueil</a>
+        <a href="calendrier.html" class="menu-item">📅 Calendrier</a>
+        <a href="Journal.html" class="menu-item">❤️ Journal</a>
+        <a href="assistant.html" class="menu-item active">💬 Assistant</a>
+        <a href="profile.html" class="menu-item">👤 Profil</a>
+    </div>
+
+    <script>
         // Variables globales
         let isTyping = false;
         const messagesArea = document.getElementById('messagesArea');
@@ -909,37 +804,6 @@
             showNotification('Retour à l\'accueil');
         }
 
-        // Navigation
-        function showTab(tab) {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            
-            const activeItem = event.target.closest('.nav-item');
-            activeItem.classList.add('active');
-            hapticFeedback(activeItem);
-            
-            let message = "";
-            switch(tab) {
-                case 'calendar':
-                    message = "Calendrier du cycle ouvert";
-                    break;
-                case 'journal':
-                    message = "Journal de santé ouvert";
-                    break;
-                case 'assistant':
-                    notification.innerHTML = 
-                    tabName === 'assistant' 
-                    ? 'Redirection vers l\'assistant IA...' 
-                    : '';
-                    break;
-                case 'profile':
-                    message = "Profil utilisateur ouvert";
-                    break;
-            }
-            
-            showNotification(message);
-        }
-
         // Système de notification
         function showNotification(message) {
             const notification = document.createElement('div');
@@ -1005,6 +869,24 @@
             });
             
             observer.observe(messagesArea, { childList: true });
+
+            // Floating menu toggle
+            function toggleMenu() {
+                const menu = document.querySelector('.floating-menu');
+                const menuBtn = document.querySelector('.floating-menu-btn');
+                menu.classList.toggle('visible');
+                menuBtn.classList.toggle('active');
+            }
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const menu = document.querySelector('.floating-menu');
+                const menuBtn = document.querySelector('.floating-menu-btn');
+                if (menu && menu.classList.contains('visible') && !menuBtn.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.remove('visible');
+                    menuBtn.classList.remove('active');
+                }
+            });
         });
     </script>
 </body>
