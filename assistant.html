@@ -649,6 +649,24 @@
     </div>
 
     <script>
+        // Floating menu toggle
+        function toggleMenu() {
+            const menu = document.querySelector('.floating-menu');
+            const menuBtn = document.querySelector('.floating-menu-btn');
+            menu.classList.toggle('visible');
+            menuBtn.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.floating-menu');
+            const menuBtn = document.querySelector('.floating-menu-btn');
+            if (menu && menu.classList.contains('visible') && !menuBtn.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('visible');
+                menuBtn.classList.remove('active');
+            }
+        });
+
         // Variables globales
         let isTyping = false;
         const messagesArea = document.getElementById('messagesArea');
@@ -853,24 +871,6 @@
             });
             
             observer.observe(messagesArea, { childList: true });
-
-            // Floating menu toggle
-            function toggleMenu() {
-                const menu = document.querySelector('.floating-menu');
-                const menuBtn = document.querySelector('.floating-menu-btn');
-                menu.classList.toggle('visible');
-                menuBtn.classList.toggle('active');
-            }
-
-            // Close menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const menu = document.querySelector('.floating-menu');
-                const menuBtn = document.querySelector('.floating-menu-btn');
-                if (menu && menu.classList.contains('visible') && !menuBtn.contains(event.target) && !menu.contains(event.target)) {
-                    menu.classList.remove('visible');
-                    menuBtn.classList.remove('active');
-                }
-            });
         });
     </script>
 </body>
