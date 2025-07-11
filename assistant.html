@@ -634,7 +634,7 @@
             </div>
 
             <!-- Nouveau bouton flottant -->
-            <div class="floating-menu-btn" onclick="toggleMenu()">
+    <div class="floating-menu-btn">
                 <div class="menu-icon">☰</div>
             </div>
 
@@ -664,6 +664,19 @@
             if (menu && menu.classList.contains('visible') && !menuBtn.contains(event.target) && !menu.contains(event.target)) {
                 menu.classList.remove('visible');
                 menuBtn.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ce code s'exécutera une fois le DOM chargé.
+
+            // Logique du chat (existante)
+            // ... (messageInput, sendBtn, observer, etc.)
+
+            // Logique du menu flottant maintenant attachée ici
+            const menuBtnForEvent = document.querySelector('.floating-menu-btn');
+            if (menuBtnForEvent) {
+                menuBtnForEvent.addEventListener('click', toggleMenu);
             }
         });
 
