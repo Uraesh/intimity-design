@@ -70,20 +70,6 @@
             position: relative;
         }
 
-        /* Encoche du périphérique */
-        .device-notch {
-            position: absolute;
-            width: 150px;
-            height: 30px;
-            background: #111;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
-            z-index: 10;
-        }
-
         /* Container mobile */
         .mobile-container {
             width: 100%;
@@ -94,7 +80,7 @@
             overflow-x: hidden;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            padding-bottom: 0;
+            /* padding-bottom: 0; Inchangé car déjà à 0 ou géré dynamiquement */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -534,7 +520,6 @@
         <div class="device-button volume-down"></div>
         <div class="device-button power"></div>
         <div class="device-screen">
-            <div class="device-notch"></div>
             <div class="mobile-container">
                 <div class="status-bar">
                     <span>9:41</span>
@@ -732,6 +717,8 @@
         <a href="Journal.html" class="menu-item active">❤️ Journal</a>
         <a href="assistant.html" class="menu-item">💬 Assistant</a>
         <a href="profile.html" class="menu-item">👤 Profil</a>
+    </div>
+        </div>
     </div>
 
     <script>
