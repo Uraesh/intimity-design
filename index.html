@@ -70,20 +70,6 @@
             position: relative;
         }
 
-        /* Encoche du périphérique */
-        .device-notch {
-            position: absolute;
-            width: 150px;
-            height: 30px;
-            background: #111;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
-            z-index: 10;
-        }
-
         /* Container mobile */
         .mobile-container {
             width: 100%;
@@ -94,7 +80,7 @@
             overflow-x: hidden;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none;
-            padding-bottom: 70px; /* Espace pour la barre de navigation */
+            /* padding-bottom: 70px;  Supprimé car la barre de nav n'est plus en bas */
         }
 
         .mobile-container::-webkit-scrollbar {
@@ -669,8 +655,6 @@
         <div class="device-button volume-down"></div>
         <div class="device-button power"></div>
         
-        <!-- Encoche du périphérique -->
-        <div class="device-notch"></div>
         
         <!-- Écran du périphérique -->
         <div class="device-screen">
@@ -805,20 +789,19 @@
                 </div>
             </div>
             
+            <!-- Nouveau bouton flottant -->
+            <div class="floating-menu-btn" onclick="toggleMenu()">
+                <div class="menu-icon">☰</div>
+            </div>
+
+            <div class="floating-menu">
+                <a href="index.html" class="menu-item active">🏠 Accueil</a>
+                <a href="calendrier.html" class="menu-item">📅 Calendrier</a>
+                <a href="Journal.html" class="menu-item">❤️ Journal</a>
+                <a href="assistant.html" class="menu-item">💬 Assistant</a>
+                <a href="profile.html" class="menu-item">👤 Profil</a>
+            </div>
         </div>
-    </div>
-
-    <!-- Nouveau bouton flottant -->
-    <div class="floating-menu-btn" onclick="toggleMenu()">
-        <div class="menu-icon">☰</div>
-    </div>
-
-    <div class="floating-menu">
-        <a href="index.html" class="menu-item active">🏠 Accueil</a>
-        <a href="calendrier.html" class="menu-item">📅 Calendrier</a>
-        <a href="Journal.html" class="menu-item">❤️ Journal</a>
-        <a href="assistant.html" class="menu-item">💬 Assistant</a>
-        <a href="profile.html" class="menu-item">👤 Profil</a>
     </div>
 
     <script>
