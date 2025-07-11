@@ -414,70 +414,6 @@
             font-size: 14px;
         }
 
-        /* Bottom Navigation - iOS/Android */
-        .nav-bar {
-            position: fixed;
-            bottom: -56px; /* Masquée par défaut */
-            left: 50%;
-            transform: translateX(-50%) translateY(0);
-            width: 100%;
-            max-width: 500px;
-            height: 56px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background: #1C1C1E; /* Fond mode sommeil iOS / #121212 pour Android */
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .nav-bar.visible {
-            transform: translateX(-50%) translateY(0);
-            bottom: 0;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            flex: 1;
-            color: #8B5A83; /* Prune Sophistiquée pour inactif */
-            text-decoration: none;
-            font-size: 10px;
-            font-weight: 500;
-            transition: all 200ms ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-item.active {
-            color: #FF6B8A; /* Corail Moderne pour actif */
-        }
-        
-        .nav-item:focus {
-            outline: 2px solid rgba(255, 255, 255, 0.3);
-            outline-offset: 2px;
-        }
-        
-        .material-icons {
-            font-size: 24px;
-            margin-bottom: 4px;
-            transition: all 200ms ease;
-        }
-        
-        .nav-label {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 0.1px;
-        }
-        
         /* Indicateur de défilement */
         .scroll-hint {
             position: fixed;
@@ -504,42 +440,6 @@
             pointer-events: none;
         }
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #8B5A83; /* Prune Sophistiquée pour l'état inactif */
-            font-size: 10px;
-            transition: all 0.3s ease;
-            padding: 8px 12px;
-            border-radius: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .nav-item.active {
-            color: #FF6B8A; /* Corail Moderne pour l'état actif */
-            background: rgba(255, 107, 138, 0.1);
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(255, 107, 138, 0.2);
-        }
-
-        .nav-item:hover {
-            color: #FF6B8A;
-            transform: translateY(-2px);
-        }
-
-        .nav-item i {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
         /* Icons */
         .fas {
             font-family: FontAwesome;
@@ -558,6 +458,74 @@
         .fas.fa-tint::before { content: '💧'; }
         .fas.fa-sticky-note::before { content: '📝'; }
         .fas.fa-chart-line::before { content: '📊'; }
+
+        /* Bouton et menu flottants */
+        .floating-menu-btn {
+            position: absolute; /* Changé de fixed à absolute */
+            bottom: 20px; /* Ajusté pour être dans l'écran du device */
+            right: 20px; /* Ajusté pour être dans l'écran du device */
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B8A 0%, #8B5A83 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .floating-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        .floating-menu {
+            position: absolute; /* Changé de fixed à absolute */
+            bottom: 90px; /* Ajusté pour être au-dessus du bouton dans l'écran du device */
+            right: 20px; /* Ajusté pour être dans l'écran du device */
+            background: #2C2C2E; /* Darker background for dark theme */
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25); /* Stronger shadow for dark theme */
+            padding: 10px 0;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: none;
+        }
+
+        .floating-menu.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            z-index: 1002;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: #fff; /* Light text for dark theme */
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #3C3C3E; /* Darker hover for dark theme */
+        }
+
+        .menu-item.active {
+            color: #FF6B8A;
+            font-weight: 600;
+            background-color: rgba(255, 107, 138, 0.15); /* Adjusted for dark theme */
+        }
     </style>
 </head>
 <body>
@@ -747,148 +715,26 @@
                 </div>
             </div>
             
-            <!-- Barre de navigation -->
-            <div class="nav-bar" role="navigation" aria-label="Navigation principale">
-                <a href="calendrier.html" class="nav-item" aria-label="Calendrier" data-active="false">
-                    <span class="material-icons md-24" aria-hidden="true">event</span>
-                    <span class="nav-label">Calendrier</span>
-                </a>
-                <a href="Journal.html" class="nav-item active" aria-label="Journal" data-active="true">
-                    <span class="material-icons md-24" aria-hidden="true">favorite</span>
-                    <span class="nav-label">Journal</span>
-                </a>
-                <a href="index.html" class="nav-item" aria-label="Accueil" data-active="false">
-                    <span class="material-icons md-24" aria-hidden="true">home</span>
-                    <span class="nav-label">Accueil</span>
-                </a>
-                <a href="assistant.html" class="nav-item" aria-label="Assistant IA" data-active="false">
-                    <span class="material-icons md-24" aria-hidden="true">chat</span>
-                    <span class="nav-label">Assistant</span>
-                </a>
-                <a href="profile.html" class="nav-item" aria-label="Profil" data-active="false">
-                    <span class="material-icons md-24" aria-hidden="true">account_circle</span>
-                    <span class="nav-label">Profil</span>
-                </a>
-            </div>
         </div>
     </div>
 
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
+
+    <!-- Nouveau bouton flottant -->
+    <div class="floating-menu-btn" onclick="toggleMenu()">
+        <div class="menu-icon">☰</div>
+    </div>
+
+    <div class="floating-menu">
+        <a href="index.html" class="menu-item">🏠 Accueil</a>
+        <a href="calendrier.html" class="menu-item">📅 Calendrier</a>
+        <a href="Journal.html" class="menu-item active">❤️ Journal</a>
+        <a href="assistant.html" class="menu-item">💬 Assistant</a>
+        <a href="profile.html" class="menu-item">👤 Profil</a>
+    </div>
+
     <script>
-        // Gestion de l'affichage de la barre de navigation au défilement
-        document.addEventListener('DOMContentLoaded', function() {
-            const navBar = document.querySelector('.nav-bar');
-            const mobileContainer = document.querySelector('.mobile-container');
-            const scrollHint = document.querySelector('.scroll-hint');
-            let lastScrollTop = 0;
-            let isScrolling = false;
-            let scrollTimeout;
-            let hintTimeout;
-            
-            // Détection de la plateforme (iOS/Android)
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            // Mettre à jour les icônes en fonction de la plateforme
-            function updateIcons() {
-                const calendarIcon = document.querySelector('[aria-label="Calendrier"] .material-icons');
-                const journalIcon = document.querySelector('[aria-label="Journal"] .material-icons');
-                const assistantIcon = document.querySelector('[aria-label="Assistant IA"] .material-icons');
-                const profileIcon = document.querySelector('[aria-label="Profil"] .material-icons');
-                
-                if (isIOS) {
-                    calendarIcon.textContent = 'calendar';
-                    journalIcon.textContent = 'favorite';
-                    assistantIcon.textContent = 'chat_bubble';
-                    profileIcon.textContent = 'person';
-                }
-            }
-
-            // Fonction pour gérer le défilement avec animation fluide
-            function handleScroll() {
-                if (isScrolling) return;
-                isScrolling = true;
-                
-                const st = mobileContainer.scrollTop || document.documentElement.scrollTop;
-                const isScrollingDown = st > lastScrollTop;
-                
-                // Animation d'apparition/disparition de l'indicateur
-                if (st > 100 && isScrollingDown) {
-                    scrollHint.classList.add('hidden');
-                    navBar.style.transform = 'translateX(-50%) translateY(0)';
-                    navBar.classList.add('visible');
-                } else if (st <= 100 || !isScrollingDown) {
-                    navBar.style.transform = 'translateX(-50%) translateY(0)';
-                    navBar.classList.add('visible');
-                }
-                
-                lastScrollTop = st <= 0 ? 0 : st;
-                
-                // Cacher la barre après un délai d'inactivité
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    if (st > 100) {
-                        navBar.style.transform = 'translateX(-50%) translateY(100%)';
-                        setTimeout(() => {
-                            navBar.classList.remove('visible');
-                        }, 300);
-                    }
-                    isScrolling = false;
-                }, 2000);
-                
-                // Réinitialiser l'état de défilement
-                requestAnimationFrame(() => {
-                    isScrolling = false;
-                });
-            }
-            
-            // Fonction pour gérer le toucher
-            function handleTouchMove(e) {
-                if (e.touches.length === 1) {
-                    handleScroll();
-                }
-            }
-
-            // Initialisation
-            function init() {
-                updateIcons();
-                
-                // Masquer l'indicateur après 5 secondes
-                hintTimeout = setTimeout(() => {
-                    scrollHint.classList.add('hidden');
-                }, 5000);
-                
-                // Réinitialiser le timer d'inactivité de l'indicateur
-                document.addEventListener('mousemove', () => {
-                    clearTimeout(hintTimeout);
-                    hintTimeout = setTimeout(() => {
-                        scrollHint.classList.add('hidden');
-                    }, 5000);
-                });
-                
-                // Gestion des événements tactiles
-                mobileContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
-                mobileContainer.addEventListener('scroll', handleScroll, { passive: true });
-                
-                // Gestion du clic sur les éléments de navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', function(e) {
-                        // Mettre à jour l'état actif
-                        document.querySelectorAll('.nav-item').forEach(i => {
-                            i.classList.remove('active');
-                            i.setAttribute('data-active', 'false');
-                        });
-                        this.classList.add('active');
-                        this.setAttribute('data-active', 'true');
-                    });
-                });
-            }
-            
-            // Démarrer l'initialisation
-            init();
-        });
         // Date management
         const today = new Date();
         let currentDate = new Date(today);
@@ -991,6 +837,24 @@
 
         // Initialize
         updateDateDisplay();
+
+        // Floating menu toggle
+        function toggleMenu() {
+            const menu = document.querySelector('.floating-menu');
+            const menuBtn = document.querySelector('.floating-menu-btn');
+            menu.classList.toggle('visible');
+            menuBtn.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.floating-menu');
+            const menuBtn = document.querySelector('.floating-menu-btn');
+            if (menu && menu.classList.contains('visible') && !menuBtn.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('visible');
+                menuBtn.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
